@@ -19,12 +19,11 @@
             {{-- Brand Logo --}}
             <div class="flex items-center justify-between h-16 px-5 border-b border-white/10 shrink-0">
                 <a href="{{ route('seeker.dashboard') }}" class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-xl bg-secondary-500 flex items-center justify-center text-white font-bold text-sm shadow-md shrink-0">
-                        LB
-                    </div>
-                    <span x-show="sidebarOpen" class="text-white font-heading font-bold text-base tracking-tight whitespace-nowrap">
-                        Lucky Boss <span class="text-xs text-secondary-400 font-semibold uppercase ml-1">Talent</span>
-                    </span>
+                    <img 
+                        src="{{ asset('images/lucky-boss-logo-transparent.png') }}" 
+                        alt="Lucky Boss" 
+                        class="h-8 w-auto object-contain"
+                    >
                 </a>
             </div>
 

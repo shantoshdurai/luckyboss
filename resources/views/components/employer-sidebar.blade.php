@@ -17,10 +17,13 @@
             class="hidden lg:flex flex-col fixed inset-y-0 left-0 z-30 bg-white border-r border-border transition-all duration-300 overflow-hidden"
         >
             {{-- Logo --}}
-            <div class="flex items-center h-16 px-5 border-b border-border flex-shrink-0">
+            <div class="flex items-center h-16 px-5 border-b border-border flex-shrink-0 bg-white">
                 <a href="{{ route('employer.dashboard') }}" class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-secondary-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">LB</div>
-                    <span x-show="sidebarOpen" x-transition class="text-navy font-heading font-bold text-base whitespace-nowrap">Lucky Boss</span>
+                    <img 
+                        src="{{ asset('images/lucky-boss-logo-transparent.png') }}" 
+                        alt="Lucky Boss" 
+                        class="h-9 w-auto object-contain"
+                    >
                 </a>
             </div>
 
