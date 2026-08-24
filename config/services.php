@@ -38,8 +38,12 @@ return [
     'firebase' => [
         'project_id' => env('FIREBASE_PROJECT_ID', 'luckyboss-617d2'),
         'project_number' => env('FIREBASE_PROJECT_NUMBER', '655783263537'),
-        'api_key' => env('FIREBASE_API_KEY', 'AIzaSyBIqaS9NX_hNPWMvOVehnaBC8cask2GxlI'),
+        'api_key' => env('FIREBASE_API_KEY', 'AIzaSyAtJpQWHICsqtYljEwFpjweM6AWx-r-w8g'),
+        'auth_domain' => env('FIREBASE_AUTH_DOMAIN', 'luckyboss-617d2.firebaseapp.com'),
         'storage_bucket' => env('FIREBASE_STORAGE_BUCKET', 'luckyboss-617d2.firebasestorage.app'),
+        'messaging_sender_id' => env('FIREBASE_MESSAGING_SENDER_ID', '655783263537'),
+        'app_id' => env('FIREBASE_APP_ID', '1:655783263537:web:cfe4a6c244d88b7e158410'),
+        'measurement_id' => env('FIREBASE_MEASUREMENT_ID', 'G-Q1CP691KL8'),
         'apps' => [
             'employer' => 'com.app.luckybossemployer',
             'seeker' => 'com.userapp.luckyboss',
