@@ -20,7 +20,7 @@ class MasterController extends Controller
             'company-types' => ['model' => CompanyType::class, 'label' => 'Company Types', 'fields' => ['name']],
             'company-grades' => ['model' => CompanyGrade::class, 'label' => 'Company Grades', 'fields' => ['name']],
             'countries' => ['model' => Country::class, 'label' => 'Countries', 'fields' => ['name', 'code', 'sort_order']],
-            'job-categories' => ['model' => JobCategory::class, 'label' => 'Job Categories', 'fields' => ['name', 'description', 'icon', 'icon_image', 'sort_order', 'show_on_home']],
+            'job-categories', 'categories' => ['model' => JobCategory::class, 'label' => 'Job Categories', 'fields' => ['name', 'description', 'icon', 'icon_image', 'sort_order', 'show_on_home']],
             default => abort(404),
         };
     }
@@ -30,7 +30,7 @@ class MasterController extends Controller
     public function index(string $master): View
     {
         $this->ensureAdmin(); $definition = $this->definition($master); $model = $definition['model'];
-        $records = $model::when($master === 'job-categories', fn ($query) => $query->orderBy('sort_order'))->orderBy('name')->paginate(20);
+        $records = $model::when(in_array($master, ['job-categories', 'categories'], true), fn ($query) => $query->orderBy('sort_order'))->orderBy('name')->paginate(20);
         return view('admin.masters.index', compact('master', 'definition', 'records'));
     }
 
