@@ -153,6 +153,71 @@
                             </div>
                         </div>
                     </div>
+
+                    {{-- Gmail SMTP & Automated Mailers Configuration Box --}}
+                    <div class="bg-white rounded-2xl p-6 sm:p-8 border border-border shadow-sm">
+                        <div class="flex items-center justify-between pb-4 mb-6 border-b border-border">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center font-bold">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-lg font-heading font-bold text-navy">Gmail SMTP Settings</h2>
+                                    <p class="text-xs text-text-muted">Automated candidate notifications, password resets & employer emails.</p>
+                                </div>
+                            </div>
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>Active SMTP</span>
+                            </span>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-2">Mail Mailer</label>
+                                    <input type="text" name="mail_mailer" value="{{ $mailSettings['mail_mailer'] ?? 'smtp' }}" class="form-input font-mono text-xs" readonly>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-2">Mail Host</label>
+                                    <input type="text" name="mail_host" value="{{ $mailSettings['mail_host'] ?? 'smtp.gmail.com' }}" class="form-input font-mono text-xs" required>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-2">Mail Port</label>
+                                    <input type="number" name="mail_port" value="{{ $mailSettings['mail_port'] ?? 587 }}" class="form-input font-mono text-xs" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-2">Encryption</label>
+                                    <input type="text" name="mail_encryption" value="{{ $mailSettings['mail_encryption'] ?? 'tls' }}" class="form-input font-mono text-xs" required>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-2">Gmail Username</label>
+                                    <input type="email" name="mail_username" value="{{ $mailSettings['mail_username'] ?? 'luckybossea@gmail.com' }}" class="form-input font-mono text-xs" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-2">Gmail App Password</label>
+                                    <input type="password" name="mail_password" value="{{ $mailSettings['mail_password'] ?? 'onzswvfwffzyqptj' }}" class="form-input font-mono text-xs" required>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-2">Mail From Address</label>
+                                    <input type="email" name="mail_from_address" value="{{ $mailSettings['mail_from_address'] ?? 'luckybossea@gmail.com' }}" class="form-input font-mono text-xs" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-2">Mail From Sender Name</label>
+                                    <input type="text" name="mail_from_name" value="{{ $mailSettings['mail_from_name'] ?? 'Lucky Boss' }}" class="form-input font-mono text-xs" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
