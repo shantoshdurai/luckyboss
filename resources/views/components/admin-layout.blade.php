@@ -599,16 +599,25 @@
                             <div class="p-4 bg-navy text-white flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <h4 class="text-sm font-bold">Platform Notifications</h4>
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white" x-text="unreadCount + ' new'"></span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white" x-text="notifications.length > 0 ? (notifications.length + ' new') : '0 new'"></span>
                                 </div>
-                                <button @click="markAllAsRead()" class="text-xs text-secondary-300 hover:text-white transition-colors cursor-pointer">
-                                    Mark all read
+                                <button x-show="notifications.length > 0" @click="clearAllNotifications()" class="text-xs text-secondary-300 hover:text-white transition-colors cursor-pointer">
+                                    Clear all
                                 </button>
                             </div>
                             <div class="max-h-80 overflow-y-auto divide-y divide-border">
+                                <template x-if="notifications.length === 0">
+                                    <div class="py-8 px-4 text-center">
+                                        <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-2.5">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        </div>
+                                        <p class="text-xs font-bold text-navy">All Caught Up!</p>
+                                        <p class="text-[11px] text-slate-400 mt-0.5">No unread notifications. History is recorded in Admin logs.</p>
+                                    </div>
+                                </template>
                                 <template x-for="n in notifications" :key="n.id">
                                     <div @click="playChime(n.type)" class="p-4 hover:bg-slate-50 transition-colors cursor-pointer flex items-start gap-3">
-                                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0" :class="n.unread ? 'bg-secondary-100 text-secondary-700' : 'bg-slate-100 text-slate-500'">
+                                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-secondary-100 text-secondary-700">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                         </div>
                                         <div class="min-w-0 flex-1">
@@ -619,9 +628,13 @@
                                     </div>
                                 </template>
                             </div>
-                            <div class="p-3 bg-slate-50 border-t border-border text-center">
-                                <a href="{{ route('admin.notifications.index') }}" class="text-xs font-bold text-accent hover:underline">
-                                    Open Full Notification Hub →
+                            <div class="p-3 bg-slate-50 border-t border-border flex items-center justify-between gap-2">
+                                <button @click="clearAllNotifications()" :disabled="notifications.length === 0" type="button" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 border border-slate-200 hover:border-rose-200 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    <span x-text="notifications.length > 0 ? 'Clear All Notifications' : 'All Notifications Cleared'"></span>
+                                </button>
+                                <a href="{{ route('admin.notifications.index') }}" title="Open Admin Notification Logs" class="py-2 px-3 rounded-xl text-xs font-bold text-slate-600 hover:text-navy hover:bg-slate-200/70 border border-slate-200 transition-all shrink-0">
+                                    Logs ↗
                                 </a>
                             </div>
                         </div>

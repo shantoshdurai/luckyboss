@@ -60,6 +60,7 @@ Route::middleware('auth')->group(function () {
         $notifications = \App\Models\PlatformNotification::where(function ($q) {
                 $q->where('user_id', auth()->id())->orWhereNull('user_id');
             })
+            ->whereNull('read_at')
             ->latest()
             ->take(8)
             ->get()
@@ -70,18 +71,29 @@ Route::middleware('auth')->group(function () {
                     'title' => $n->title,
                     'body' => $n->body,
                     'time' => $n->created_at ? $n->created_at->diffForHumans() : 'Just now',
-                    'unread' => is_null($n->read_at),
+                    'unread' => true,
                 ];
             });
-        $unreadCount = $notifications->where('unread', true)->count();
+        $unreadCount = $notifications->count();
         return response()->json([
             'notifications' => $notifications,
             'unreadCount' => $unreadCount,
         ]);
     })->name('notifications.feed');
 
+    Route::post('/notifications/clear-all', function () {
+        \App\Models\PlatformNotification::where(function ($q) {
+                $q->where('user_id', auth()->id())->orWhereNull('user_id');
+            })
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+        return response()->json(['status' => 'success', 'message' => 'Notifications cleared for user.']);
+    })->name('notifications.clear-all');
+
     Route::post('/notifications/mark-all-read', function () {
-        \App\Models\PlatformNotification::where('user_id', auth()->id())
+        \App\Models\PlatformNotification::where(function ($q) {
+                $q->where('user_id', auth()->id())->orWhereNull('user_id');
+            })
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
         return response()->json(['status' => 'success']);

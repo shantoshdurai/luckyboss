@@ -102,12 +102,12 @@ Alpine.data('notificationCenter', () => ({
             this.loadNotifications();
         }
     },
-    async markAllAsRead() {
+    async clearAllNotifications() {
         this.unreadCount = 0;
-        this.notifications.forEach(n => n.unread = false);
+        this.notifications = [];
         try {
             const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            await fetch('/notifications/mark-all-read', {
+            await fetch('/notifications/clear-all', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -115,7 +115,11 @@ Alpine.data('notificationCenter', () => ({
                     'Accept': 'application/json'
                 }
             });
+            window.playLuckySound('system_alert');
         } catch (e) {}
+    },
+    async markAllAsRead() {
+        await this.clearAllNotifications();
     },
     playChime(type) {
         window.playLuckySound(type);
