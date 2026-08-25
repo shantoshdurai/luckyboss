@@ -130,17 +130,24 @@
                             <div class="flex items-center gap-2 shrink-0">
                                 <form method="POST" action="{{ route('seeker.jobs.save', $job) }}">
                                     @csrf
-                                    <button type="submit" class="p-2 text-slate-400 hover:text-navy rounded-xl border border-border bg-white transition-colors cursor-pointer" title="{{ in_array($job->id, $savedJobIds, true) ? 'Unsave' : 'Save' }}">
-                                        <svg class="w-4 h-4 {{ in_array($job->id, $savedJobIds, true) ? 'fill-accent text-accent' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg>
+                                    <button type="submit" class="p-2 text-slate-400 hover:text-navy rounded-xl border border-border bg-white transition-colors cursor-pointer" title="{{ in_array($job->id, $savedJobIds ?? [], true) ? 'Unsave' : 'Save' }}">
+                                        <svg class="w-4 h-4 {{ in_array($job->id, $savedJobIds ?? [], true) ? 'fill-accent text-accent' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg>
                                     </button>
                                 </form>
 
-                                <form method="POST" action="{{ route('seeker.jobs.apply', $job) }}">
-                                    @csrf
-                                    <button type="submit" class="btn btn-primary btn-sm text-xs font-bold py-1.5 px-4 shadow-xs cursor-pointer">
-                                        Apply Now
-                                    </button>
-                                </form>
+                                @if(in_array($job->id, $appliedJobIds ?? [], true))
+                                    <span class="inline-flex items-center gap-1 py-1.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-300 text-xs font-bold shadow-xs">
+                                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                        <span>Applied</span>
+                                    </span>
+                                @else
+                                    <form method="POST" action="{{ route('seeker.jobs.apply', $job) }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-primary btn-sm text-xs font-bold py-1.5 px-4 shadow-xs cursor-pointer hover:scale-102 transition-transform">
+                                            Apply Now
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                     @empty
@@ -187,12 +194,19 @@
                                     </button>
                                 </form>
 
-                                <form method="POST" action="{{ route('seeker.jobs.apply', $job) }}">
-                                    @csrf
-                                    <button type="submit" class="btn btn-primary btn-sm text-xs font-bold py-1.5 px-4 shadow-xs cursor-pointer">
-                                        Apply Now
-                                    </button>
-                                </form>
+                                @if(in_array($job->id, $appliedJobIds ?? [], true))
+                                    <span class="inline-flex items-center gap-1 py-1.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-300 text-xs font-bold shadow-xs">
+                                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                        <span>Applied</span>
+                                    </span>
+                                @else
+                                    <form method="POST" action="{{ route('seeker.jobs.apply', $job) }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-primary btn-sm text-xs font-bold py-1.5 px-4 shadow-xs cursor-pointer hover:scale-102 transition-transform">
+                                            Apply Now
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                     @empty
@@ -316,17 +330,24 @@
                             <div class="flex items-center gap-2 shrink-0">
                                 <form method="POST" action="{{ route('seeker.jobs.save', $job) }}">
                                     @csrf
-                                    <button type="submit" class="p-2 text-slate-400 hover:text-navy rounded-xl border border-border bg-white transition-colors cursor-pointer" title="Save">
-                                        <svg class="w-4 h-4 {{ in_array($job->id, $savedJobIds, true) ? 'fill-accent text-accent' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg>
+                                    <button type="submit" class="p-2 text-slate-400 hover:text-navy rounded-xl border border-border bg-white transition-colors cursor-pointer" title="{{ in_array($job->id, $savedJobIds ?? [], true) ? 'Unsave' : 'Save' }}">
+                                        <svg class="w-4 h-4 {{ in_array($job->id, $savedJobIds ?? [], true) ? 'fill-accent text-accent' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg>
                                     </button>
                                 </form>
 
-                                <form method="POST" action="{{ route('seeker.jobs.apply', $job) }}">
-                                    @csrf
-                                    <button type="submit" class="btn btn-primary btn-sm text-xs font-bold py-1.5 px-4 shadow-xs cursor-pointer">
-                                        Apply Now
-                                    </button>
-                                </form>
+                                @if(in_array($job->id, $appliedJobIds ?? [], true))
+                                    <span class="inline-flex items-center gap-1 py-1.5 px-3 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-300 text-xs font-bold shadow-xs">
+                                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                        <span>Applied</span>
+                                    </span>
+                                @else
+                                    <form method="POST" action="{{ route('seeker.jobs.apply', $job) }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-primary btn-sm text-xs font-bold py-1.5 px-4 shadow-xs cursor-pointer hover:scale-102 transition-transform">
+                                            Apply Now
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                     @empty

@@ -210,7 +210,8 @@
                         @forelse($jobs as $job)
                             @php 
                                 $companyName = $job->company->name ?? 'Verified Regional Partner'; 
-                                $isSaved = in_array($job->id, $savedJobIds, true);
+                                $isSaved = in_array($job->id, $savedJobIds ?? [], true);
+                                $hasApplied = in_array($job->id, $appliedJobIds ?? [], true);
                             @endphp
 
                             <article class="bg-white rounded-2xl border border-border hover:border-accent/50 p-6 shadow-xs hover:shadow-md transition-all group">
@@ -257,7 +258,7 @@
                                         </div>
                                     </div>
 
-                                    {{-- Right Side Actions: Saved Job & View & Apply Button --}}
+                                    {{-- Right Side Actions: Saved Job & Apply Status Button --}}
                                     <div class="flex md:flex-col items-center md:items-end justify-between md:justify-start gap-4 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-border">
                                         {{-- Save Job Toggle --}}
                                         @auth
@@ -265,29 +266,36 @@
                                                 @csrf
                                                 <button type="submit" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-navy transition-colors cursor-pointer" title="{{ $isSaved ? 'Remove from Saved' : 'Save Job' }}">
                                                     <svg class="w-4 h-4 {{ $isSaved ? 'text-rose-500 fill-rose-500' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                                                    <span>{{ $isSaved ? 'Saved' : 'Saved Jobs' }}</span>
+                                                    <span>{{ $isSaved ? 'Saved' : 'Save Job' }}</span>
                                                 </button>
                                             </form>
                                         @else
                                             <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-navy transition-colors">
                                                 <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                                                <span>Saved Jobs</span>
+                                                <span>Save Job</span>
                                             </a>
                                         @endauth
 
-                                        {{-- View & Apply Button --}}
-                                        @auth
-                                            <form method="POST" action="{{ route('seeker.jobs.apply', $job) }}">
-                                                @csrf
-                                                <button type="submit" class="btn btn-primary py-2.5 px-6 text-xs font-bold shadow-md cursor-pointer">
-                                                    View & Apply
-                                                </button>
-                                            </form>
-                                        @else
-                                            <a href="{{ route('login') }}" class="btn btn-primary py-2.5 px-6 text-xs font-bold shadow-md">
-                                                View & Apply
+                                        {{-- Apply Status Button --}}
+                                        @if($hasApplied)
+                                            <a href="{{ route('seeker.dashboard', ['tab' => 'applications']) }}" class="inline-flex items-center gap-1.5 py-2.5 px-5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-300 text-xs font-bold shadow-xs hover:bg-emerald-100 transition-colors">
+                                                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                                <span>Applied &bull; Track Status</span>
                                             </a>
-                                        @endauth
+                                        @else
+                                            @auth
+                                                <form method="POST" action="{{ route('seeker.jobs.apply', $job) }}">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-primary py-2.5 px-6 text-xs font-bold shadow-md cursor-pointer hover:scale-102 transition-transform">
+                                                        View & Apply
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <a href="{{ route('login') }}" class="btn btn-primary py-2.5 px-6 text-xs font-bold shadow-md">
+                                                    View & Apply
+                                                </a>
+                                            @endauth
+                                        @endif
                                     </div>
                                 </div>
                             </article>

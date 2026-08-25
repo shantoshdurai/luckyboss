@@ -34,13 +34,16 @@ class PublicPortalController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-        $savedJobIds = auth()->check() ? auth()->user()->savedJobs()->pluck('job_id')->all() : [];
+        $user = auth()->user();
+        $savedJobIds = $user ? $user->savedJobs()->pluck('job_id')->all() : [];
+        $appliedJobIds = ($user && $user->hasRole('job-seeker')) ? $user->applications()->pluck('job_id')->all() : [];
 
         return view('public.jobs', [
             'jobs' => $jobs,
             'countries' => Country::where('is_active', true)->orderBy('sort_order')->orderBy('name')->get(),
             'categories' => JobCategory::where('is_active', true)->orderBy('name')->get(),
             'savedJobIds' => $savedJobIds,
+            'appliedJobIds' => $appliedJobIds,
         ]);
     }
 

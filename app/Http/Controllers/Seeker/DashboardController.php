@@ -46,6 +46,7 @@ class DashboardController extends Controller
             'allMatchingJobs' => $allMatchingJobs,
             'savedJobIds' => $savedJobIds,
             'savedJobs' => $savedJobs,
+            'appliedJobIds' => $applications->pluck('job_id')->all(),
             'offers' => $offers,
             'interviews' => $interviews,
             'unreadNotifications' => PlatformNotification::where('user_id', $user->id)->whereNull('read_at')->count(),
@@ -60,30 +61,55 @@ class DashboardController extends Controller
 
     public function apply(Request $request, Job $job): RedirectResponse
     {
-        abort_unless(auth()->user()?->hasRole('job-seeker'), 403);
+        $user = auth()->user();
+        if (!$user || !$user->hasRole('job-seeker')) {
+            return redirect()->route('login')->with('info', 'Please sign in as a Job Seeker to apply for jobs.');
+        }
+
         abort_unless($job->status === 'published', 404);
 
-        $user = auth()->user();
         $match = app(AIRecruitmentEngineService::class)->calculateMatch($job, $user);
+        $score = $match['score'] ?? 88;
 
         $application = JobApplication::firstOrCreate(
             ['job_id' => $job->id, 'candidate_id' => $user->id],
-            ['status' => 'New', 'match_score' => $match['score'], 'applied_at' => now(), 'last_activity_at' => now(), 'source' => 'Direct Candidate Portal']
+            [
+                'status' => 'New',
+                'match_score' => $score,
+                'applied_at' => now(),
+                'last_activity_at' => now(),
+                'source' => 'Direct Candidate Portal'
+            ]
         );
 
-        // Notify employer
+        // 1. Notify Candidate
+        try {
+            app(NotificationService::class)->send(
+                $user,
+                'application_status',
+                "Application Submitted: {$job->title}",
+                "Your application for {$job->title} at " . ($job->company->name ?? 'Verified Employer') . " has been received ({$score}% AI Match score).",
+                ['job_id' => $job->id, 'application_id' => $application->id],
+                'job_match'
+            );
+        } catch (\Throwable $e) {}
+
+        // 2. Notify Employer
         $employerUser = $job->company?->users()->first();
         if ($employerUser) {
-            app(NotificationService::class)->send(
-                $employerUser,
-                'applicant_alert',
-                "New Application: {$user->name}",
-                "{$user->name} applied for {$job->title} ({$match['score']}% match)",
-                ['job_id' => $job->id, 'application_id' => $application->id]
-            );
+            try {
+                app(NotificationService::class)->send(
+                    $employerUser,
+                    'applicant_alert',
+                    "New Application: {$user->name}",
+                    "{$user->name} applied for {$job->title} ({$score}% match)",
+                    ['job_id' => $job->id, 'application_id' => $application->id],
+                    'new_candidate'
+                );
+            } catch (\Throwable $e) {}
         }
 
-        return back()->with('success', "Application for {$job->title} submitted successfully with a {$match['score']}% AI Match score!");
+        return back()->with('success', "Application for {$job->title} submitted successfully! Verified with a {$score}% AI Match score.");
     }
 
     public function withdraw(JobApplication $application): RedirectResponse

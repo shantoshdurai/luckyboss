@@ -433,10 +433,17 @@
                                 </span>
                             </div>
 
-                            <a href="{{ route('jobs.index', ['keyword' => $job->title]) }}" class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-navy hover:bg-slate-800 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all">
-                                <span>Apply Now</span>
-                                <svg class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                            </a>
+                            @if(in_array($job->id, $appliedJobIds ?? [], true))
+                                <a href="{{ route('seeker.dashboard', ['tab' => 'applications']) }}" class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-300 text-xs font-bold shadow-xs hover:bg-emerald-100 transition-all">
+                                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                    <span>Applied</span>
+                                </a>
+                            @else
+                                <a href="{{ route('jobs.index', ['keyword' => $job->title]) }}" class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-navy hover:bg-slate-800 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all">
+                                    <span>Apply Now</span>
+                                    <svg class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                </a>
+                            @endif
                         </div>
                     </article>
                 @empty

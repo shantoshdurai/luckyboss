@@ -64,6 +64,9 @@ class HomeController extends Controller
                     ->orderBy('sort_order')
                     ->first();
             }),
+
+            'savedJobIds' => auth()->check() ? auth()->user()->savedJobs()->pluck('job_id')->all() : [],
+            'appliedJobIds' => (auth()->check() && auth()->user()->hasRole('job-seeker')) ? auth()->user()->applications()->pluck('job_id')->all() : [],
         ]);
     }
 }
