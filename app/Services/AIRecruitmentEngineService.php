@@ -331,33 +331,74 @@ class AIRecruitmentEngineService
     /**
      * Query External Cloud LLM API with structured prompt
      */
+        /**
+     * Query External Cloud LLM API (Gemini or OpenAI) with structured prompt
+     */
     private function queryCloudLLM(Job $job, User $candidate, ?CandidateProfile $profile, string $apiKey): ?array
     {
+        $geminiKey = config('services.gemini.api_key', env('GEMINI_API_KEY', $apiKey));
+        $geminiModel = config('services.gemini.model', env('GEMINI_MODEL', 'gemini-2.5-flash'));
+
+        // 1. Try Gemini API
+        if (!empty($geminiKey)) {
+            try {
+                $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$geminiModel}:generateContent?key=" . urlencode($geminiKey);
+                $prompt = "Evaluate job candidate match:\nJob: {$job->title}\nDescription: {$job->description}\nCandidate: {$profile?->current_title}, Exp: {$profile?->years_experience} yrs, Summary: {$profile?->professional_summary}.\nRespond ONLY in valid JSON format: {\"score\": (integer 0-100), \"rationale\": (string), \"strengths\": (array of strings), \"gaps\": (array of strings)}";
+
+                $response = Http::withoutVerifying()
+                    ->timeout(6)
+                    ->post($endpoint, [
+                        'contents' => [['parts' => [['text' => $prompt]]]]
+                    ]);
+
+                if ($response->successful()) {
+                    $raw = $response->json('candidates.0.content.parts.0.text');
+                    // Extract JSON substring if wrapped in markdown blocks
+                    if (preg_match('/\{[\s\S]*\}/', $raw, $matches)) {
+                        $json = json_decode($matches[0], true);
+                        if (isset($json['score'])) {
+                            return [
+                                'score' => min(99, max(45, (int) $json['score'])),
+                                'rationale' => $json['rationale'] ?? "{$json['score']}% match evaluated by AI.",
+                                'provider' => 'gemini_cloud_api_2.5_flash',
+                                'strengths' => $json['strengths'] ?? [],
+                                'gaps' => $json['gaps'] ?? [],
+                            ];
+                        }
+                    }
+                }
+            } catch (\Throwable) {}
+        }
+
+        // 2. Try OpenAI API
         $prompt = "Evaluate job candidate match:\nJob: {$job->title}\nDescription: {$job->description}\nCandidate: {$profile?->current_title}, Exp: {$profile?->years_experience} yrs, Summary: {$profile?->professional_summary}.\nReturn JSON with: score (0-100), rationale (string), strengths (array of strings), gaps (array of strings).";
 
-        $response = Http::withToken($apiKey)
-            ->timeout(6)
-            ->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-4o-mini',
-                'messages' => [
-                    ['role' => 'system', 'content' => 'You are an enterprise HR recruitment matching AI. Respond only in valid JSON.'],
-                    ['role' => 'user', 'content' => $prompt]
-                ],
-                'temperature' => 0.2,
-            ]);
+        try {
+            $response = Http::withoutVerifying()
+                ->withToken($apiKey)
+                ->timeout(6)
+                ->post('https://api.openai.com/v1/chat/completions', [
+                    'model' => 'gpt-4o-mini',
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'You are an enterprise HR recruitment matching AI. Respond only in valid JSON.'],
+                        ['role' => 'user', 'content' => $prompt]
+                    ],
+                    'temperature' => 0.2,
+                ]);
 
-        if ($response->successful()) {
-            $json = json_decode($response->json('choices.0.message.content'), true);
-            if (isset($json['score'])) {
-                return [
-                    'score' => (int) $json['score'],
-                    'rationale' => $json['rationale'] ?? "{$json['score']}% match calculated by AI LLM.",
-                    'provider' => 'cloud_llm_gpt4o_mini',
-                    'strengths' => $json['strengths'] ?? [],
-                    'gaps' => $json['gaps'] ?? [],
-                ];
+            if ($response->successful()) {
+                $json = json_decode($response->json('choices.0.message.content'), true);
+                if (isset($json['score'])) {
+                    return [
+                        'score' => (int) $json['score'],
+                        'rationale' => $json['rationale'] ?? "{$json['score']}% match calculated by AI LLM.",
+                        'provider' => 'cloud_llm_gpt4o_mini',
+                        'strengths' => $json['strengths'] ?? [],
+                        'gaps' => $json['gaps'] ?? [],
+                    ];
+                }
             }
-        }
+        } catch (\Throwable) {}
 
         return null;
     }
