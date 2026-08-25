@@ -76,6 +76,93 @@
                     </div>
                 @endif
 
+                                {{-- SPECIAL DEDICATED WORKSPACE: Flutter Mobile Apps Hub --}}
+                @if($section === 'mobile-apps')
+                    <div class="bg-white p-6 rounded-2xl border border-border shadow-xs space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-navy">Flutter Mobile Applications Ecosystem</h3>
+                                <p class="text-xs text-text-muted mt-0.5">Unified cross-platform iOS & Android apps for Job Seekers and Employers.</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                                <span>Planned for Post-Web Completion</span>
+                            </span>
+                        </div>
+
+                        {{-- Roadmap & Architecture Notice --}}
+                        <div class="p-4 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-900 flex items-start gap-3">
+                            <svg class="w-5 h-5 text-accent shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <div class="space-y-1">
+                                <span class="font-bold">Development Roadmap Notice:</span>
+                                <p class="text-blue-800 leading-relaxed">
+                                    The mobile apps are scheduled to be built using <strong>Flutter & Dart</strong> immediately after the web platform completion. The backend <strong>REST API architecture is already live and fully equipped</strong> to serve mobile authentication, AI resume extractions, real-time push notifications, and job applications.
+                                </p>
+                            </div>
+                        </div>
+
+                        {{-- Apps Overview Cards --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 rounded-xl bg-navy text-white flex items-center justify-center font-bold text-xs">JS</div>
+                                        <div>
+                                            <h4 class="text-sm font-bold text-navy">Job Seeker Mobile App</h4>
+                                            <span class="text-[10px] text-slate-500">iOS (App Store) & Android (Google Play)</span>
+                                        </div>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-700">In Roadmap</span>
+                                </div>
+                                <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside">
+                                    <li>AI-powered camera resume scanner & auto-fill</li>
+                                    <li>1-click Quick Apply with verified credentials</li>
+                                    <li>Push notifications for interview calls & job matches</li>
+                                    <li>In-app AI Career Copilot & live messaging</li>
+                                </ul>
+                            </div>
+
+                            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">EM</div>
+                                        <div>
+                                            <h4 class="text-sm font-bold text-navy">Employer Recruiter App</h4>
+                                            <span class="text-[10px] text-slate-500">iOS (App Store) & Android (Google Play)</span>
+                                        </div>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-700">In Roadmap</span>
+                                </div>
+                                <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside">
+                                    <li>Instant candidate application alerts & swipe screening</li>
+                                    <li>Direct WhatsApp / Call button integration</li>
+                                    <li>Interview scheduler with Google Calendar sync</li>
+                                    <li>On-the-go candidate shortlisting & offer generation</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        {{-- Mobile Configuration Registry --}}
+                        <div class="border border-border rounded-xl p-5 bg-slate-50 space-y-4">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-navy">Pre-Configured App Parameters</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                                <div class="p-3 bg-white rounded-xl border border-border">
+                                    <span class="text-slate-400 block text-[10px] uppercase font-bold">Android Package ID</span>
+                                    <span class="font-mono font-bold text-navy mt-0.5 block">com.luckyboss.app</span>
+                                </div>
+                                <div class="p-3 bg-white rounded-xl border border-border">
+                                    <span class="text-slate-400 block text-[10px] uppercase font-bold">iOS Bundle ID</span>
+                                    <span class="font-mono font-bold text-navy mt-0.5 block">com.luckyboss.ios</span>
+                                </div>
+                                <div class="p-3 bg-white rounded-xl border border-border">
+                                    <span class="text-slate-400 block text-[10px] uppercase font-bold">Minimum App Version</span>
+                                    <span class="font-mono font-bold text-navy mt-0.5 block">1.0.0 (Build 1)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 {{-- Module Summary & Controls Status --}}
                 <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
                     <div class="flex items-start justify-between gap-4">
