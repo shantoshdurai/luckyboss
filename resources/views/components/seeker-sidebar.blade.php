@@ -17,12 +17,12 @@
             class="hidden lg:flex flex-col fixed inset-y-0 left-0 z-30 bg-navy overflow-hidden shadow-2xl transition-all duration-200"
         >
             {{-- Brand Logo --}}
-            <div class="flex items-center justify-between h-16 px-5 border-b border-white/10 shrink-0">
+            <div class="flex items-center justify-between h-18 px-5 border-b border-white/10 shrink-0">
                 <a href="{{ route('seeker.dashboard') }}" class="flex items-center gap-2.5">
                     <img 
                         src="{{ asset('images/lucky-boss-logo-transparent.png') }}" 
                         alt="Lucky Boss" 
-                        class="h-8 w-auto object-contain"
+                        class="h-10 w-auto max-h-12 object-contain"
                     >
                 </a>
             </div>
