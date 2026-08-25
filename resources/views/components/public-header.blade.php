@@ -22,41 +22,41 @@
                 </div>
             </a>
 
-            {{-- Clean Desktop Navigation --}}
-            <nav class="hidden xl:flex items-center gap-1 p-1 rounded-2xl border border-slate-200 bg-slate-50/80 text-slate-700 shadow-inner">
+            {{-- Clean Desktop Navigation with Smooth Animated Tab Transitions --}}
+            <nav class="hidden xl:flex items-center gap-1 p-1 rounded-2xl border border-slate-200 bg-slate-50/90 text-slate-700 shadow-inner">
                 {{-- 1. Home --}}
                 <a href="{{ route('home') }}" 
-                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-150 {{ request()->routeIs('home') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/60' }}">
+                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-200 transform hover:-translate-y-0.5 {{ request()->routeIs('home') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/70' }}">
                     Home
                 </a>
 
                 {{-- 2. Find Jobs --}}
                 <a href="{{ route('jobs.index') }}" 
-                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-150 {{ request()->routeIs('jobs.*') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/60' }}">
+                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-200 transform hover:-translate-y-0.5 {{ request()->routeIs('jobs.*') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/70' }}">
                     Find Jobs
                 </a>
 
                 {{-- 3. Job Categories --}}
                 <a href="{{ route('categories.index') }}" 
-                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-150 {{ request()->routeIs('categories.*') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/60' }}">
+                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-200 transform hover:-translate-y-0.5 {{ request()->routeIs('categories.*') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/70' }}">
                     Job Categories
                 </a>
 
                 {{-- 4. Employers --}}
                 <a href="{{ route('employers.public') }}" 
-                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-150 {{ request()->routeIs('employers.*') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/60' }}">
+                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-200 transform hover:-translate-y-0.5 {{ request()->routeIs('employers.*') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/70' }}">
                     Employers
                 </a>
 
                 {{-- 5. Job Seekers --}}
                 <a href="{{ route('seekers.public') }}" 
-                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-150 {{ request()->routeIs('seekers.*') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/60' }}">
+                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-200 transform hover:-translate-y-0.5 {{ request()->routeIs('seekers.*') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/70' }}">
                     Job Seekers
                 </a>
 
                 {{-- 6. Blog --}}
                 <a href="{{ route('blogs.index') }}" 
-                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-150 {{ request()->routeIs('blogs.*') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/60' }}">
+                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-200 transform hover:-translate-y-0.5 {{ request()->routeIs('blogs.*') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/70' }}">
                     Blog
                 </a>
             </nav>
@@ -66,7 +66,7 @@
                 @auth
                     @php $user = auth()->user(); @endphp
                     <a href="{{ $user->hasRole('super-admin') ? route('admin.dashboard') : ($user->hasRole('employer') ? route('employer.dashboard') : route('seeker.dashboard')) }}"
-                       class="btn btn-primary btn-sm shadow-md flex items-center gap-1.5 text-xs font-bold">
+                       class="btn btn-primary btn-sm shadow-md flex items-center gap-1.5 text-xs font-bold transition-all hover:scale-102">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                         <span>Dashboard</span>
                     </a>
@@ -87,7 +87,7 @@
                     <div class="relative" @click.away="registerOpen = false">
                         <button @click="registerOpen = !registerOpen" 
                                 type="button"
-                                class="btn btn-primary btn-sm py-1.5 px-4 font-bold text-xs shadow-md flex items-center gap-1.5 cursor-pointer">
+                                class="btn btn-primary btn-sm py-1.5 px-4 font-bold text-xs shadow-md flex items-center gap-1.5 cursor-pointer hover:scale-102 transition-transform">
                             <span>Register</span>
                             <svg :class="registerOpen ? 'rotate-180' : ''" class="w-3.5 h-3.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
