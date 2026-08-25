@@ -159,32 +159,14 @@ Alpine.data('counter', (target = 0, duration = 2000, suffix = '+') => ({
 
 // ─── AI Side Chat Assistant Component ──────────────────────────
 Alpine.data('aiChat', () => ({
-    formatMessage(text) {
-        if (!text) return '';
-        // Escape HTML
-        let esc = text
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
-        // Replace bold **text**
-        esc = esc.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-navy">$1</strong>');
-        // Replace italic *text*
-        esc = esc.replace(/\*([^*]+)\*/g, '<em class="italic">$1</em>');
-        // Replace bullet points * item or - item
-        esc = esc.replace(/^\s*[\*\-]\s+(.+)$/gm, '<div class="flex items-start gap-1.5 ml-1 mt-0.5"><span class="text-accent font-bold">•</span><span>$1</span></div>');
-        // Replace double newlines with spacing
-        esc = esc.replace(/\n\n/g, '<div class="h-2"></div>');
-        // Replace single newlines with br
-        esc = esc.replace(/\n/g, '<br>');
-        return esc;
-    },
     open: false,
+    isExpanded: false,
     input: '',
     loading: false,
     messages: [
         {
             sender: 'ai',
-            text: 'Hello! I am Lucky AI, your intelligent recruitment copilot. How can I help your career or hiring journey today?',
+            text: 'Hello! I am Lucky AI, your intelligent recruitment copilot.\n\nHow can I help your career or hiring journey today?',
             time: 'Just now',
             suggestions: [
                 '🔍 Find Warehouse jobs in Singapore',
@@ -202,6 +184,43 @@ Alpine.data('aiChat', () => ({
                 if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
             });
         }
+    },
+    toggleExpand() {
+        this.isExpanded = !this.isExpanded;
+        this.$nextTick(() => {
+            const scrollArea = document.getElementById('ai-chat-messages');
+            if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
+        });
+    },
+    formatMessage(text) {
+        if (!text) return '';
+        // Escape HTML
+        let formatted = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
+        // Headers: ### Title
+        formatted = formatted.replace(/^###\s+(.+)$/gm, '<h4 class="font-bold text-navy text-xs sm:text-sm mt-2 mb-1">$1</h4>');
+        formatted = formatted.replace(/^##\s+(.+)$/gm, '<h3 class="font-bold text-navy text-sm sm:text-base mt-2 mb-1">$1</h3>');
+
+        // Bold **text**
+        formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-navy">$1</strong>');
+        
+        // Italic *text*
+        formatted = formatted.replace(/\*([^*]+)\*/g, '<em class="italic text-slate-700">$1</em>');
+
+        // Bullet points: • item or * item or - item
+        formatted = formatted.replace(/^\s*[•\*\-]\s+(.+)$/gm, '<div class="flex items-start gap-2 my-1"><span class="text-accent font-bold mt-0.5">•</span><span class="flex-1">$1</span></div>');
+
+        // Numbered lists: 1. item
+        formatted = formatted.replace(/^\s*(\d+)\.\s+(.+)$/gm, '<div class="flex items-start gap-2 my-1"><span class="font-bold text-navy text-xs">$1.</span><span class="flex-1">$2</span></div>');
+
+        // Paragraph separation
+        formatted = formatted.replace(/\n\n+/g, '<div class="h-2.5"></div>');
+        formatted = formatted.replace(/\n/g, '<br>');
+
+        return formatted;
     },
     sendSuggestion(text) {
         this.input = text;
@@ -247,23 +266,19 @@ Alpine.data('aiChat', () => ({
                 throw new Error('Fallback to local intelligence');
             }
         } catch (e) {
-            // Intelligent local fallback response
-            let fallbackReply = "I found matching opportunities on Lucky Boss! You can view all published vacancies across Singapore, Malaysia, and India.";
+            let fallbackReply = "I found matching opportunities on Lucky Boss! You can explore all published vacancies across Singapore, Malaysia, and India.";
             let actions = [{ label: 'Explore All Jobs', url: '/jobs' }];
 
             const q = query.toLowerCase();
             if (q.includes('warehouse') || q.includes('supervisor')) {
                 fallbackReply = "We have active openings for Warehouse Supervisor and Coordinator in Singapore (Jurong East & Kallang, SGD 2,800 - 4,500/mo).";
                 actions = [{ label: 'View Warehouse Jobs', url: '/jobs?keyword=Warehouse' }];
-            } else if (q.includes('resume') || q.includes('score')) {
-                fallbackReply = "To increase your profile match score to 90%+, complete your work history, list key equipment/safety skills, and set your target location in your profile.";
-                actions = [{ label: 'Create/Edit Profile', url: '/register/job-seeker' }];
-            } else if (q.includes('employer') || q.includes('post') || q.includes('hire')) {
-                fallbackReply = "Employers can register to post vacancies, access 50,000+ candidate profiles, and use automated AI candidate ranking.";
-                actions = [{ label: 'Employer Portal', url: '/register/employer' }];
-            } else if (q.includes('salary') || q.includes('paying')) {
-                fallbackReply = "Top engineering and operations roles currently range from SGD 4,200 to SGD 6,500/mo with immediate shortlisting.";
-                actions = [{ label: 'Search Top Salaries', url: '/jobs' }];
+            } else if (q.includes('help') || q.includes('what can you')) {
+                fallbackReply = "I can help you discover verified jobs, optimize your resume match score, review salary benchmarks, or post vacancies as an employer.";
+                actions = [
+                    { label: 'Search Jobs', url: '/jobs' },
+                    { label: 'Employer Portal', url: '/register/employer' }
+                ];
             }
 
             this.messages.push({
