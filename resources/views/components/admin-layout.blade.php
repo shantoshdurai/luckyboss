@@ -36,14 +36,14 @@
             class="hidden lg:flex flex-col fixed inset-y-0 left-0 z-30 bg-[#031533] border-r border-white/10 overflow-hidden shadow-2xl transition-all duration-200"
         >
             {{-- Logo Header --}}
-            <div class="flex items-center justify-between h-16 px-5 border-b border-white/10 shrink-0">
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-xl bg-secondary-500 flex items-center justify-center text-white font-bold text-sm shadow-md shrink-0">
-                        LB
-                    </div>
-                    <span x-show="sidebarOpen" class="text-white font-heading font-bold text-base tracking-tight whitespace-nowrap">
-                        Lucky Boss <span class="text-xs text-secondary-400 font-semibold uppercase ml-1">Admin</span>
-                    </span>
+            <div class="flex items-center justify-between h-18 px-4 border-b border-white/10 shrink-0">
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 bg-white/95 py-1 px-3 rounded-xl shadow-xs transition-transform hover:scale-102">
+                    <img 
+                        src="{{ asset('images/lucky-boss-logo-transparent.png') }}" 
+                        alt="Lucky Boss" 
+                        class="h-7 w-auto object-contain"
+                    >
+                    <span class="text-[10px] bg-navy text-white px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ml-1">Admin</span>
                 </a>
             </div>
 

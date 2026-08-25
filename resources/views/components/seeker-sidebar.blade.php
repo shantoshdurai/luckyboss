@@ -11,40 +11,40 @@
 </head>
 <body class="h-full antialiased font-sans text-text-primary" x-data="{ sidebarOpen: true, mobileSidebarOpen: false }">
     <div class="flex min-h-screen">
-        {{-- Desktop Candidate Sidebar --}}
+        {{-- Desktop Candidate Sidebar (Clean White with High-Contrast Typography) --}}
         <aside
             :class="sidebarOpen ? 'w-64' : 'w-20'"
-            class="hidden lg:flex flex-col fixed inset-y-0 left-0 z-30 bg-navy overflow-hidden shadow-2xl transition-all duration-200"
+            class="hidden lg:flex flex-col fixed inset-y-0 left-0 z-30 bg-white border-r border-border overflow-hidden shadow-xs transition-all duration-200"
         >
-            {{-- Brand Logo --}}
-            <div class="flex items-center justify-between h-18 px-5 border-b border-white/10 shrink-0">
+            {{-- Brand Logo (Crystal Clear on White Background) --}}
+            <div class="flex items-center justify-between h-20 px-5 border-b border-border shrink-0 bg-white">
                 <a href="{{ route('seeker.dashboard') }}" class="flex items-center gap-2.5">
                     <img 
                         src="{{ asset('images/lucky-boss-logo-transparent.png') }}" 
                         alt="Lucky Boss" 
-                        class="h-10 w-auto max-h-12 object-contain"
+                        class="h-11 w-auto max-h-12 object-contain"
                     >
                 </a>
             </div>
 
             {{-- Verified Candidate Card --}}
-            <div x-show="sidebarOpen" class="p-4 border-b border-white/10 bg-white/5">
+            <div x-show="sidebarOpen" class="p-4 border-b border-border bg-slate-50/70">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-secondary-500/20 border border-secondary-400/30 flex items-center justify-center text-secondary-300 font-bold shrink-0">
-                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    <div class="w-10 h-10 rounded-xl bg-secondary-100 text-secondary-700 flex items-center justify-center font-bold shrink-0">
+                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                     </div>
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-1.5">
-                            <p class="text-sm font-bold text-white truncate">{{ auth()->user()->name ?? 'Candidate' }}</p>
-                            <span class="inline-flex text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Verified</span>
+                            <p class="text-sm font-bold text-navy truncate">{{ auth()->user()->name ?? 'Candidate' }}</p>
+                            <span class="inline-flex text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">Verified</span>
                         </div>
-                        <a href="{{ route('seeker.profile.edit') }}" class="text-xs text-secondary-400 hover:text-white transition-colors">Edit Profile &rarr;</a>
+                        <a href="{{ route('seeker.profile.edit') }}" class="text-xs text-secondary-600 hover:text-navy font-semibold transition-colors">Edit Profile &rarr;</a>
                     </div>
                 </div>
             </div>
 
             {{-- Navigation --}}
-            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1.5 scrollbar-thin">
+            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1 scrollbar-thin">
                 @php
                     $currentTab = request('tab', 'dashboard');
                     $nav = [
@@ -61,11 +61,11 @@
                     <a href="{{ $item['url'] }}"
                        @class([
                            'flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150',
-                           'bg-accent text-white shadow-md' => $item['active'],
-                           'text-slate-300 hover:text-white hover:bg-white/10' => !$item['active'],
+                           'bg-navy text-white shadow-xs font-bold' => $item['active'],
+                           'text-slate-700 hover:text-navy hover:bg-slate-100' => !$item['active'],
                        ])
                     >
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 shrink-0 {{ $item['active'] ? 'text-white' : 'text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $item['icon'] }}" />
                         </svg>
                         <span x-show="sidebarOpen" class="whitespace-nowrap">{{ $item['label'] }}</span>
@@ -74,10 +74,10 @@
             </nav>
 
             {{-- Sidebar Footer --}}
-            <div class="p-3 border-t border-white/10 shrink-0">
+            <div class="p-3 border-t border-border shrink-0">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer">
+                    <button type="submit" class="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                         <span x-show="sidebarOpen">Sign Out</span>
                     </button>
