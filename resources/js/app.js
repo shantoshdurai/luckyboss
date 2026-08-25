@@ -159,6 +159,25 @@ Alpine.data('counter', (target = 0, duration = 2000, suffix = '+') => ({
 
 // ─── AI Side Chat Assistant Component ──────────────────────────
 Alpine.data('aiChat', () => ({
+    formatMessage(text) {
+        if (!text) return '';
+        // Escape HTML
+        let esc = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        // Replace bold **text**
+        esc = esc.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-navy">$1</strong>');
+        // Replace italic *text*
+        esc = esc.replace(/\*([^*]+)\*/g, '<em class="italic">$1</em>');
+        // Replace bullet points * item or - item
+        esc = esc.replace(/^\s*[\*\-]\s+(.+)$/gm, '<div class="flex items-start gap-1.5 ml-1 mt-0.5"><span class="text-accent font-bold">•</span><span>$1</span></div>');
+        // Replace double newlines with spacing
+        esc = esc.replace(/\n\n/g, '<div class="h-2"></div>');
+        // Replace single newlines with br
+        esc = esc.replace(/\n/g, '<br>');
+        return esc;
+    },
     open: false,
     input: '',
     loading: false,

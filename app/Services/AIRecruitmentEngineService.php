@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\CandidateProfile;
+use App\Models\FeatureFlag;
 use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\User;
@@ -15,7 +16,7 @@ class AIRecruitmentEngineService
 {
     /**
      * Calculate candidate match score for a job vacancy.
-     * Uses Cloud LLM when API key is available, with seamless automatic fallback to Local Heuristic NLP Model.
+     * Uses Cloud LLM (Gemini 2.5 Flash) when API key & toggle are active, with seamless automatic fallback to Local Heuristic NLP Model.
      *
      * @return array{score: int, rationale: string, provider: string, strengths: array, gaps: array}
      */
@@ -23,16 +24,21 @@ class AIRecruitmentEngineService
     {
         $profile = $candidate->candidateProfile;
 
-        // 1. Attempt Cloud LLM calculation if API key is active
-        $apiKey = $this->getActiveApiKey($job);
-        if ($apiKey) {
-            try {
-                $llmResult = $this->queryCloudLLM($job, $candidate, $profile, $apiKey);
-                if ($llmResult !== null) {
-                    return $llmResult;
+        // Check if AI is enabled in Admin panel
+        $isAiEnabled = FeatureFlag::where('key', 'platform_ai_enabled')->value('is_enabled') ?? true;
+
+        // 1. Attempt Cloud LLM calculation if API key & feature flag are active
+        if ($isAiEnabled) {
+            $apiKey = $this->getActiveApiKey($job);
+            if ($apiKey) {
+                try {
+                    $llmResult = $this->queryCloudLLM($job, $candidate, $profile, $apiKey);
+                    if ($llmResult !== null) {
+                        return $llmResult;
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning("AI Cloud API failed, falling back to local heuristic model: " . $e->getMessage());
                 }
-            } catch (\Throwable $e) {
-                Log::warning("AI Cloud API failed, falling back to local heuristic model: " . $e->getMessage());
             }
         }
 
@@ -76,7 +82,7 @@ class AIRecruitmentEngineService
             $score += max(5, 25 - (($minExp - $candExp) * 6));
             $gaps[] = "Experience ({$candExp} yrs) below requested minimum ({$minExp} yrs)";
         } else {
-            $score += 20; // Overqualified bonus
+            $score += 20;
             $strengths[] = "Senior experience profile ({$candExp} years)";
         }
 
@@ -95,7 +101,7 @@ class AIRecruitmentEngineService
                 $strengths[] = "Regional candidate ({$job->country_code})";
             }
         } else {
-            $score += 5; // Cross-border recruitment platform tolerance
+            $score += 5;
             $gaps[] = "Candidate based in different country ({$profile?->country_code})";
         }
 
@@ -118,7 +124,6 @@ class AIRecruitmentEngineService
         // 5. Compensation Alignment (10% Weight)
         $expectedSalary = (float) ($profile?->expected_salary ?? 0);
         $budgetMax = (float) ($job->salary_max ?? 0);
-        $budgetMin = (float) ($job->salary_min ?? 0);
 
         if ($expectedSalary > 0 && $budgetMax > 0) {
             if ($expectedSalary <= $budgetMax) {
@@ -129,12 +134,10 @@ class AIRecruitmentEngineService
                 $gaps[] = "Expected salary slightly above published range";
             }
         } else {
-            $score += 8; // Default good faith budget score
+            $score += 8;
         }
 
         $finalScore = min(99, max(45, $score));
-
-        // Rationale synthesis
         $rationale = "{$finalScore}% Match — " . ($strengths[0] ?? "Profile evaluated against vacancy parameters.");
 
         return [
@@ -185,11 +188,13 @@ class AIRecruitmentEngineService
      */
     public function parseResumeData(string $rawText, string $fileName = ''): array
     {
-        // 1. Attempt Cloud LLM extraction if API key configured
-        $envKey = env('OPENAI_API_KEY') ?: env('GEMINI_API_KEY');
-        if ($envKey) {
+        $isAiEnabled = FeatureFlag::where('key', 'platform_ai_enabled')->value('is_enabled') ?? true;
+        $geminiKey = config('services.gemini.api_key', env('GEMINI_API_KEY'));
+
+        // 1. Attempt Cloud Gemini LLM extraction if API key & toggle configured
+        if ($isAiEnabled && $geminiKey) {
             try {
-                $cloudResult = $this->queryCloudResumeParser($rawText, $envKey);
+                $cloudResult = $this->queryCloudResumeParser($rawText, $geminiKey);
                 if ($cloudResult !== null) {
                     return $cloudResult;
                 }
@@ -204,7 +209,6 @@ class AIRecruitmentEngineService
             $yearsExp = max(1, (int) $matches[1]);
         }
 
-        // Detect plausible title
         $commonTitles = [
             'Warehouse Supervisor', 'Logistics Coordinator', 'Warehouse Assistant',
             'Construction Site Supervisor', 'Operations Executive', 'Safety Officer',
@@ -236,30 +240,132 @@ class AIRecruitmentEngineService
         ];
     }
 
+    /**
+     * Gemini AI Resume Parser
+     */
     private function queryCloudResumeParser(string $text, string $apiKey): ?array
     {
-        $prompt = "Extract resume profile JSON from this text:\n" . substr($text, 0, 3000) . "\nReturn valid JSON format: { title, skills (array of 5-8 strings), years_experience (int), summary (string), current_location (string), expected_salary (int), notice_period (string) }";
+        $geminiModel = config('services.gemini.model', env('GEMINI_MODEL', 'gemini-2.5-flash'));
+        $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$geminiModel}:generateContent?key=" . urlencode($apiKey);
 
-        $response = Http::withToken($apiKey)
-            ->timeout(6)
-            ->post('https://api.openai.com/v1/chat/completions', [
-                'model' => 'gpt-4o-mini',
-                'messages' => [
-                    ['role' => 'system', 'content' => 'You are an HR resume parser. Return only JSON.'],
-                    ['role' => 'user', 'content' => $prompt]
-                ],
-                'temperature' => 0.1,
+        $prompt = "Extract resume profile JSON from this text:\n" . substr($text, 0, 3000) . "\nRespond ONLY with valid JSON in this exact structure: {\"title\": (string), \"skills\": [\"skill1\", \"skill2\"], \"years_experience\": (integer), \"summary\": (string), \"current_location\": (string), \"expected_salary\": (integer), \"notice_period\": (string)}";
+
+        $response = Http::withoutVerifying()
+            ->timeout(8)
+            ->post($endpoint, [
+                'contents' => [['parts' => [['text' => $prompt]]]]
             ]);
 
         if ($response->successful()) {
-            $json = json_decode($response->json('choices.0.message.content'), true);
-            if (isset($json['skills']) && is_array($json['skills'])) {
-                $json['parser'] = 'cloud_gpt4o_mini_parser';
-                return $json;
+            $raw = $response->json('candidates.0.content.parts.0.text');
+            if (preg_match('/\{[\s\S]*\}/', $raw, $matches)) {
+                $json = json_decode($matches[0], true);
+                if (isset($json['skills']) && is_array($json['skills'])) {
+                    $json['parser'] = 'gemini_cloud_api_2.5_flash';
+                    return $json;
+                }
             }
         }
 
         return null;
+    }
+
+    /**
+     * Generate Tailored Interview Questions using Gemini AI
+     */
+    public function generateInterviewQuestions(Job $job, User $candidate): array
+    {
+        $geminiKey = config('services.gemini.api_key', env('GEMINI_API_KEY'));
+        $geminiModel = config('services.gemini.model', env('GEMINI_MODEL', 'gemini-2.5-flash'));
+        $isAiEnabled = FeatureFlag::where('key', 'platform_ai_enabled')->value('is_enabled') ?? true;
+
+        if ($isAiEnabled && $geminiKey) {
+            try {
+                $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$geminiModel}:generateContent?key=" . urlencode($geminiKey);
+                $prompt = "Generate 5 smart, professional interview questions for a candidate applying for the position of '{$job->title}' in {$job->location}.
+Candidate title: {$candidate->candidateProfile?->current_title}, Exp: {$candidate->candidateProfile?->years_experience} yrs.
+Respond ONLY with valid JSON: {\"questions\": [\"Question 1\", \"Question 2\", \"Question 3\", \"Question 4\", \"Question 5\"]}";
+
+                $response = Http::withoutVerifying()->timeout(8)->post($endpoint, [
+                    'contents' => [['parts' => [['text' => $prompt]]]]
+                ]);
+
+                if ($response->successful()) {
+                    $raw = $response->json('candidates.0.content.parts.0.text');
+                    if (preg_match('/\{[\s\S]*\}/', $raw, $matches)) {
+                        $json = json_decode($matches[0], true);
+                        if (isset($json['questions']) && is_array($json['questions'])) {
+                            return [
+                                'questions' => $json['questions'],
+                                'provider' => 'gemini_cloud_api_2.5_flash'
+                            ];
+                        }
+                    }
+                }
+            } catch (\Throwable) {}
+        }
+
+        // Fallback Questions
+        return [
+            'questions' => [
+                "Can you walk us through your relevant background in {$job->title} and key projects you managed?",
+                "How do you prioritize safety, team coordination, and compliance in busy operational environments?",
+                "Describe a situation where a tight schedule or unexpected challenge occurred and how you resolved it.",
+                "What enterprise software, tools, or methodologies are you most comfortable using daily?",
+                "Why are you interested in joining our team in {$job->location} and what is your availability?"
+            ],
+            'provider' => 'local_heuristic_rule_engine'
+        ];
+    }
+
+    /**
+     * Generate or Enhance Job Description using Gemini AI
+     */
+    public function generateJobDescription(string $title, string $category = '', string $location = 'Singapore'): array
+    {
+        $geminiKey = config('services.gemini.api_key', env('GEMINI_API_KEY'));
+        $geminiModel = config('services.gemini.model', env('GEMINI_MODEL', 'gemini-2.5-flash'));
+        $isAiEnabled = FeatureFlag::where('key', 'platform_ai_enabled')->value('is_enabled') ?? true;
+
+        if ($isAiEnabled && $geminiKey) {
+            try {
+                $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$geminiModel}:generateContent?key=" . urlencode($geminiKey);
+                $prompt = "Draft a professional job vacancy posting for '{$title}' in {$location} (Category: {$category}).
+Respond ONLY in valid JSON: {\"summary\": (string), \"responsibilities\": [\"resp 1\", \"resp 2\", \"resp 3\", \"resp 4\"], \"requirements\": [\"req 1\", \"req 2\", \"req 3\", \"req 4\"]}";
+
+                $response = Http::withoutVerifying()->timeout(8)->post($endpoint, [
+                    'contents' => [['parts' => [['text' => $prompt]]]]
+                ]);
+
+                if ($response->successful()) {
+                    $raw = $response->json('candidates.0.content.parts.0.text');
+                    if (preg_match('/\{[\s\S]*\}/', $raw, $matches)) {
+                        $json = json_decode($matches[0], true);
+                        if (isset($json['responsibilities'])) {
+                            return $json + ['provider' => 'gemini_cloud_api_2.5_flash'];
+                        }
+                    }
+                }
+            } catch (\Throwable) {}
+        }
+
+        // Fallback Job Description
+        return [
+            'summary' => "We are looking for an energetic, results-driven {$title} to join our growing operations in {$location}.",
+            'responsibilities' => [
+                "Oversee daily operations and coordinate workflow across team members",
+                "Ensure compliance with company quality standards and safety regulations",
+                "Maintain accurate logs, inventory updates, and milestone reporting",
+                "Collaborate with internal departments to optimize turnaround times"
+            ],
+            'requirements' => [
+                "2+ years of relevant hands-on background in {$title} or related field",
+                "Strong verbal and written communication capabilities",
+                "Problem-solving mindset with ability to work independently in {$location}",
+                "Relevant certifications or diploma are an added advantage"
+            ],
+            'provider' => 'local_heuristic_rule_engine'
+        ];
     }
 
     /**
@@ -320,7 +426,7 @@ class AIRecruitmentEngineService
         }
 
         // 2. Check Platform Global AI Key in .env
-        $envKey = env('OPENAI_API_KEY') ?: env('GEMINI_API_KEY');
+        $envKey = config('services.gemini.api_key', env('GEMINI_API_KEY')) ?: (env('OPENAI_API_KEY') ?: env('GROQ_API_KEY'));
         if ($envKey) {
             return $envKey;
         }
@@ -329,9 +435,6 @@ class AIRecruitmentEngineService
     }
 
     /**
-     * Query External Cloud LLM API with structured prompt
-     */
-        /**
      * Query External Cloud LLM API (Gemini or OpenAI) with structured prompt
      */
     private function queryCloudLLM(Job $job, User $candidate, ?CandidateProfile $profile, string $apiKey): ?array
@@ -339,21 +442,19 @@ class AIRecruitmentEngineService
         $geminiKey = config('services.gemini.api_key', env('GEMINI_API_KEY', $apiKey));
         $geminiModel = config('services.gemini.model', env('GEMINI_MODEL', 'gemini-2.5-flash'));
 
-        // 1. Try Gemini API
         if (!empty($geminiKey)) {
             try {
                 $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$geminiModel}:generateContent?key=" . urlencode($geminiKey);
-                $prompt = "Evaluate job candidate match:\nJob: {$job->title}\nDescription: {$job->description}\nCandidate: {$profile?->current_title}, Exp: {$profile?->years_experience} yrs, Summary: {$profile?->professional_summary}.\nRespond ONLY in valid JSON format: {\"score\": (integer 0-100), \"rationale\": (string), \"strengths\": (array of strings), \"gaps\": (array of strings)}";
+                $prompt = "Evaluate job candidate match:\nJob: {$job->title}\nDescription: {$job->description}\nCandidate: {$profile?->current_title}, Exp: {$profile?->years_experience} yrs, Summary: {$profile?->professional_summary}.\nRespond ONLY in valid JSON: {\"score\": (integer 0-100), \"rationale\": (string), \"strengths\": (array of strings), \"gaps\": (array of strings)}";
 
                 $response = Http::withoutVerifying()
-                    ->timeout(6)
+                    ->timeout(8)
                     ->post($endpoint, [
                         'contents' => [['parts' => [['text' => $prompt]]]]
                     ]);
 
                 if ($response->successful()) {
                     $raw = $response->json('candidates.0.content.parts.0.text');
-                    // Extract JSON substring if wrapped in markdown blocks
                     if (preg_match('/\{[\s\S]*\}/', $raw, $matches)) {
                         $json = json_decode($matches[0], true);
                         if (isset($json['score'])) {
@@ -369,36 +470,6 @@ class AIRecruitmentEngineService
                 }
             } catch (\Throwable) {}
         }
-
-        // 2. Try OpenAI API
-        $prompt = "Evaluate job candidate match:\nJob: {$job->title}\nDescription: {$job->description}\nCandidate: {$profile?->current_title}, Exp: {$profile?->years_experience} yrs, Summary: {$profile?->professional_summary}.\nReturn JSON with: score (0-100), rationale (string), strengths (array of strings), gaps (array of strings).";
-
-        try {
-            $response = Http::withoutVerifying()
-                ->withToken($apiKey)
-                ->timeout(6)
-                ->post('https://api.openai.com/v1/chat/completions', [
-                    'model' => 'gpt-4o-mini',
-                    'messages' => [
-                        ['role' => 'system', 'content' => 'You are an enterprise HR recruitment matching AI. Respond only in valid JSON.'],
-                        ['role' => 'user', 'content' => $prompt]
-                    ],
-                    'temperature' => 0.2,
-                ]);
-
-            if ($response->successful()) {
-                $json = json_decode($response->json('choices.0.message.content'), true);
-                if (isset($json['score'])) {
-                    return [
-                        'score' => (int) $json['score'],
-                        'rationale' => $json['rationale'] ?? "{$json['score']}% match calculated by AI LLM.",
-                        'provider' => 'cloud_llm_gpt4o_mini',
-                        'strengths' => $json['strengths'] ?? [],
-                        'gaps' => $json['gaps'] ?? [],
-                    ];
-                }
-            }
-        } catch (\Throwable) {}
 
         return null;
     }

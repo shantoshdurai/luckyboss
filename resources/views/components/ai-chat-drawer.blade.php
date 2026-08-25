@@ -71,7 +71,7 @@
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                             </div>
                             <div class="space-y-2 flex-1">
-                                <div class="bg-white p-3 rounded-2xl rounded-tl-xs border border-border text-xs text-text-primary shadow-2xs leading-relaxed" x-text="msg.text"></div>
+                                <div class="bg-white p-3.5 rounded-2xl rounded-tl-xs border border-border text-xs text-text-primary shadow-2xs leading-relaxed font-sans space-y-1" x-html="formatMessage(msg.text)"></div>
                                 
                                 {{-- Action Buttons if any --}}
                                 <template x-if="msg.actions && msg.actions.length > 0">
