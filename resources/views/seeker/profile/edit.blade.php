@@ -118,22 +118,30 @@
             </div>
         </div>
 
-        {{-- Mode Selector: AI Auto-Extraction vs Manual Typing --}}
+                {{-- Mode Selector: AI Auto-Extraction vs Manual Typing --}}
         <div class="bg-white rounded-2xl border border-border p-2 shadow-xs flex items-center gap-2 max-w-md">
             <button type="button" 
                     @click="entryMode = 'ai'" 
-                    :class="entryMode === 'ai' ? 'bg-accent text-white shadow-xs' : 'text-slate-600 hover:text-navy hover:bg-slate-100'"
+                    :class="entryMode === 'ai' ? 'bg-navy text-white shadow-xs' : 'text-slate-600 hover:text-navy hover:bg-slate-100'"
                     class="flex-1 py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <svg class="w-4 h-4 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 <span>AI Resume Auto-Fill</span>
             </button>
             <button type="button" 
                     @click="entryMode = 'manual'" 
-                    :class="entryMode === 'manual' ? 'bg-accent text-white shadow-xs' : 'text-slate-600 hover:text-navy hover:bg-slate-100'"
+                    :class="entryMode === 'manual' ? 'bg-navy text-white shadow-xs' : 'text-slate-600 hover:text-navy hover:bg-slate-100'"
                     class="flex-1 py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                <svg class="w-4 h-4 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                 <span>Manual Typing Mode</span>
             </button>
+        </div>
+
+        {{-- Manual Mode Helper Banner --}}
+        <div x-show="entryMode === 'manual'" x-cloak x-transition class="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-semibold flex items-center gap-3 shadow-xs">
+            <svg class="w-5 h-5 text-accent shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div>
+                <span class="font-bold">Manual Typing Mode Active:</span> AI document upload is hidden. You can directly search/add your skills tags, fill in your experience, contact info, and write your summary below.
+            </div>
         </div>
 
         @if(session('success'))
@@ -163,7 +171,7 @@
                    class="hidden">
 
             {{-- 1. AI Resume Extraction & Document Upload Box --}}
-            <div id="resume-section" class="bg-white rounded-2xl border border-border p-6 sm:p-8 shadow-xs space-y-4">
+            <div id="resume-section" x-show="entryMode === 'ai'" x-transition class="bg-white rounded-2xl border border-border p-6 sm:p-8 shadow-xs space-y-4">
                 <div class="flex items-center justify-between border-b border-border pb-3">
                     <div>
                         <h3 class="text-base font-bold text-navy flex items-center gap-2">
