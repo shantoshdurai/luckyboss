@@ -100,6 +100,7 @@ Route::middleware('auth')->group(function () {
     })->name('notifications.mark-all-read');
 });
 
+Route::get('/register', fn() => redirect()->route('register.seeker'))->name('register');
 Route::get('/register/job-seeker', [AuthController::class, 'showCandidateRegister'])->name('register.seeker');
 Route::post('/register/job-seeker', [AuthController::class, 'registerCandidate'])->name('register.seeker.store');
 Route::get('/register/employer', [AuthController::class, 'showEmployerRegister'])->name('register.employer');
