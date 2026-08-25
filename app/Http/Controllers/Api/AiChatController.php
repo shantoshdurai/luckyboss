@@ -33,17 +33,19 @@ class AiChatController extends Controller
             try {
                 $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$geminiModel}:generateContent?key=" . urlencode($geminiKey);
                 
-                $systemInstruction = "You are Lucky AI, the intelligent, friendly, and comprehensive recruitment copilot for Lucky Boss Job & Recruitment Marketplace (operating across Singapore, Malaysia, and India).
+                $systemInstruction = "You are Lucky AI, the smart recruitment copilot for the Lucky Boss Marketplace (Singapore, Malaysia, India).
 
-STYLE & FORMATTING RULES:
-- Provide clear, complete, and neatly structured responses with natural paragraph spacing.
-- When explaining what you can do or listing tips/jobs, use clean bullet points with relevant icons/emojis (e.g. • 🔍 **Job Search:** ...).
-- Highlight key terms using **bold text**.
-- Do NOT cut off thoughts prematurely. Answer thoroughly yet concisely.
-- Maintain an inspiring, helpful, and professional tone throughout.";
+STRICT RESPONSE GUIDELINES (Goldilocks Rule - Not too short, not too long):
+1. NO FILLER FLUFF: Skip generic pleasantries (e.g. \"That is an excellent question...\"). Jump straight into the answer.
+2. CRISP & BALANCED: Structure replies as:
+   - 1 direct opening sentence.
+   - 3 to 5 concise, actionable bullet points (1-2 lines each) using icons (e.g. • 1️⃣ **Step Name:** ...).
+   - 1 short closing next-step sentence.
+3. EFFICIENT & COMPLETE: Do not write huge essays, but ALWAYS fully complete every sentence and thought without cutting off.
+4. HIGHLIGHT KEYWORDS: Use **bold** for key features, buttons, or locations.";
                 
                 $response = Http::withoutVerifying()
-                    ->timeout(12)
+                    ->timeout(10)
                     ->post($endpoint, [
                         'systemInstruction' => [
                             'parts' => [['text' => $systemInstruction]]
@@ -52,8 +54,8 @@ STYLE & FORMATTING RULES:
                             ['parts' => [['text' => $message]]]
                         ],
                         'generationConfig' => [
-                            'temperature' => 0.7,
-                            'maxOutputTokens' => 2048,
+                            'temperature' => 0.6,
+                            'maxOutputTokens' => 600,
                         ]
                     ]);
 
@@ -92,8 +94,14 @@ STYLE & FORMATTING RULES:
             ['label' => 'Post Vacancy', 'url' => route('register.employer')]
         ];
 
-        if (str_contains($q, 'help') || str_contains($q, 'what can you') || str_contains($q, 'features') || str_contains($q, 'things you can')) {
-            $reply = "I'm here to streamline your career growth and hiring workflows!\n\nHere are the key areas I help with:\n\n• 🔍 **Job Discovery & Matching:** Search vetted roles in Logistics, IT, Construction, Healthcare, and Finance.\n• 📄 **AI Resume Optimization:** Analyze and boost your candidate profile match score for employers.\n• 💼 **Interview Preparation:** Access role-specific interview checklists and common questions.\n• 🏢 **Employer Recruiter Solutions:** Post new vacancies, manage applicant pipelines, and filter qualified talent.";
+        if (str_contains($q, 'post') || str_contains($q, 'how do employers post') || str_contains($q, 'post new jobs') || str_contains($q, 'create job')) {
+            $reply = "Employers can post new job openings in 3 easy steps:\n\n• 1️⃣ **Sign In:** Log in to your Employer Portal (or create a free company account).\n• 2️⃣ **Create Vacancy:** Click **Post a Job** and enter role details, required skills, salary range, and location.\n• 3️⃣ **Publish & Match:** Review and click **Publish** to immediately reach verified candidates with automated AI fit scoring.\n\nReady to get started?";
+            $actions = [
+                ['label' => 'Post Vacancy Now', 'url' => route('register.employer')],
+                ['label' => 'Employer Pricing', 'url' => route('login')]
+            ];
+        } elseif (str_contains($q, 'help') || str_contains($q, 'what can you') || str_contains($q, 'features') || str_contains($q, 'things you can')) {
+            $reply = "I'm here to streamline your career growth and hiring workflows:\n\n• 🔍 **Job Discovery:** Search verified roles in Logistics, IT, Construction, Healthcare, and Finance.\n• 📄 **AI Resume Scoring:** Analyze and boost your profile match rate for top recruiters.\n• 💼 **Interview Prep:** Access role-specific interview checklists and common questions.\n• 🏢 **Recruiter Tools:** Post vacancies, review applications, and filter talent across Singapore, Malaysia, and India.";
             $actions = [
                 ['label' => 'Search All Jobs', 'url' => route('jobs.index')],
                 ['label' => 'Update Seeker Profile', 'url' => route('seeker.profile.edit')],
@@ -117,11 +125,6 @@ STYLE & FORMATTING RULES:
             $reply = "To achieve a **90%+ match score** on Lucky Boss:\n\n• List 5+ specific technical and operational skills.\n• Detail measurable outcomes from previous employment.\n• Keep your location and salary expectations accurate.\n• Upload a clean PDF version of your resume.";
             $actions = [
                 ['label' => 'Update Profile & Resume', 'url' => route('seeker.profile.edit')]
-            ];
-        } elseif (str_contains($q, 'employer') || str_contains($q, 'post') || str_contains($q, 'hire') || str_contains($q, 'recruiter')) {
-            $reply = "Employers on Lucky Boss get access to:\n\n• Direct vacancy publishing across Southeast Asia.\n• Automated AI candidate matching & fit scoring.\n• Integrated interview scheduling & offer dispatch.\n• Dedicated employer dashboard and team management.";
-            $actions = [
-                ['label' => 'Post Vacancy as Employer', 'url' => route('register.employer')]
             ];
         } elseif (str_contains($q, 'salary') || str_contains($q, 'paying') || str_contains($q, 'pay')) {
             $reply = "Top published roles on Lucky Boss range from **SGD 3,500 to SGD 6,500/month** across Engineering, Technology, Logistics, and Healthcare sectors.";
