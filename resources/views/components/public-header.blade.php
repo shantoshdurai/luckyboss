@@ -1,58 +1,62 @@
 <header 
     x-data="{ 
         open: false,
-        registerOpen: false
+        registerOpen: false,
+        scrolled: false
     }" 
-    class="sticky top-0 z-50 bg-[#031533] border-b border-white/10 text-white shadow-md"
+    x-init="scrolled = (window.pageYOffset > 20)"
+    @scroll.window="scrolled = (window.pageYOffset > 20)"
+    :class="scrolled ? 'bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-md' : 'bg-white border-b border-slate-200/90 shadow-xs'"
+    class="sticky top-0 z-50 transition-all duration-300 text-slate-800"
 >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-18 lg:h-20 gap-3">
-            {{-- Brand Logo --}}
+            {{-- Brand Logo (Crystal Clear on White Background) --}}
             <a href="{{ route('home') }}" class="flex items-center py-1 flex-shrink-0 group">
                 <div class="relative py-1 flex items-center">
                     <img 
                         src="{{ asset('images/lucky-boss-logo-transparent.png') }}" 
                         alt="Lucky Boss" 
-                        class="h-10 sm:h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-102 filter drop-shadow-sm"
+                        class="h-10 sm:h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-102"
                     >
                 </div>
             </a>
 
-            {{-- Clean Desktop Navigation (Specializations tab removed as requested) --}}
-            <nav class="hidden xl:flex items-center gap-1 p-1 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-md text-slate-200">
+            {{-- Clean Desktop Navigation --}}
+            <nav class="hidden xl:flex items-center gap-1 p-1 rounded-2xl border border-slate-200 bg-slate-50/80 text-slate-700 shadow-inner">
                 {{-- 1. Home --}}
                 <a href="{{ route('home') }}" 
-                   class="px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-all duration-150 {{ request()->routeIs('home') ? 'bg-white/20 text-white shadow-xs font-bold' : 'hover:text-white hover:bg-white/15' }}">
+                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-150 {{ request()->routeIs('home') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/60' }}">
                     Home
                 </a>
 
                 {{-- 2. Find Jobs --}}
                 <a href="{{ route('jobs.index') }}" 
-                   class="px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-all duration-150 {{ request()->routeIs('jobs.*') ? 'bg-white/20 text-white shadow-xs font-bold' : 'hover:text-white hover:bg-white/15' }}">
+                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-150 {{ request()->routeIs('jobs.*') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/60' }}">
                     Find Jobs
                 </a>
 
                 {{-- 3. Job Categories --}}
                 <a href="{{ route('categories.index') }}" 
-                   class="px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-all duration-150 {{ request()->routeIs('categories.*') ? 'bg-white/20 text-white shadow-xs font-bold' : 'hover:text-white hover:bg-white/15' }}">
+                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-150 {{ request()->routeIs('categories.*') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/60' }}">
                     Job Categories
                 </a>
 
                 {{-- 4. Employers --}}
                 <a href="{{ route('employers.public') }}" 
-                   class="px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-all duration-150 {{ request()->routeIs('employers.*') ? 'bg-white/20 text-white shadow-xs font-bold' : 'hover:text-white hover:bg-white/15' }}">
+                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-150 {{ request()->routeIs('employers.*') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/60' }}">
                     Employers
                 </a>
 
                 {{-- 5. Job Seekers --}}
                 <a href="{{ route('seekers.public') }}" 
-                   class="px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-all duration-150 {{ request()->routeIs('seekers.*') ? 'bg-white/20 text-white shadow-xs font-bold' : 'hover:text-white hover:bg-white/15' }}">
+                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-150 {{ request()->routeIs('seekers.*') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/60' }}">
                     Job Seekers
                 </a>
 
                 {{-- 6. Blog --}}
                 <a href="{{ route('blogs.index') }}" 
-                   class="px-3.5 py-1.5 text-xs font-semibold rounded-xl transition-all duration-150 {{ request()->routeIs('blogs.*') ? 'bg-white/20 text-white shadow-xs font-bold' : 'hover:text-white hover:bg-white/15' }}">
+                   class="px-3.5 py-1.5 text-xs rounded-xl transition-all duration-150 {{ request()->routeIs('blogs.*') ? 'bg-navy text-white shadow-xs font-bold' : 'font-semibold text-slate-700 hover:text-navy hover:bg-slate-200/60' }}">
                     Blog
                 </a>
             </nav>
@@ -69,13 +73,13 @@
                     <form method="POST" action="{{ route('logout') }}" class="inline">
                         @csrf
                         <button type="submit" 
-                                class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer">
+                                class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-navy hover:bg-slate-100 transition-colors cursor-pointer">
                             Sign Out
                         </button>
                     </form>
                 @else
                     <a href="{{ route('login') }}" 
-                       class="text-xs font-bold px-2 py-1.5 text-slate-200 hover:text-white transition-colors">
+                       class="text-xs font-bold px-3 py-1.5 text-navy hover:text-secondary-600 transition-colors">
                         Sign In
                     </a>
 
@@ -88,7 +92,7 @@
                             <svg :class="registerOpen ? 'rotate-180' : ''" class="w-3.5 h-3.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
 
-                        <div x-show="registerOpen" x-cloak class="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-border py-2 z-50">
+                        <div x-show="registerOpen" x-cloak class="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-50">
                             <a href="{{ route('register.seeker') }}" class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold text-navy hover:bg-slate-50 hover:text-secondary-600 transition-colors">
                                 <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                                 <span>Job Seeker Register</span>
@@ -105,7 +109,7 @@
             {{-- Mobile / Tablet Hamburger --}}
             <button 
                 @click="open = !open" 
-                class="xl:hidden p-2 rounded-xl transition-colors border border-white/20 text-white hover:bg-white/10 cursor-pointer" 
+                class="xl:hidden p-2 rounded-xl transition-colors border border-slate-200 text-slate-800 hover:bg-slate-100 cursor-pointer" 
                 aria-label="Menu"
             >
                 <svg x-show="!open" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
@@ -123,23 +127,23 @@
             x-transition:leave="transition ease-in duration-100" 
             x-transition:leave-start="opacity-100 translate-y-0" 
             x-transition:leave-end="opacity-0 -translate-y-2" 
-            class="xl:hidden border-t border-white/10 bg-[#031533] text-white py-5 space-y-1 rounded-b-2xl shadow-xl"
+            class="xl:hidden border-t border-slate-200 bg-white text-slate-800 py-5 space-y-1 rounded-b-2xl shadow-xl"
         >
-            <a href="{{ route('home') }}" class="block px-4 py-2 text-sm font-bold text-slate-200 hover:bg-white/10 rounded-xl">Home</a>
-            <a href="{{ route('jobs.index') }}" class="block px-4 py-2 text-sm font-bold text-slate-200 hover:bg-white/10 rounded-xl">Find Jobs</a>
-            <a href="{{ route('categories.index') }}" class="block px-4 py-2 text-sm font-bold text-slate-200 hover:bg-white/10 rounded-xl">Job Categories</a>
-            <a href="{{ route('employers.public') }}" class="block px-4 py-2 text-sm font-bold text-slate-200 hover:bg-white/10 rounded-xl">Employers</a>
-            <a href="{{ route('seekers.public') }}" class="block px-4 py-2 text-sm font-bold text-slate-200 hover:bg-white/10 rounded-xl">Job Seekers</a>
-            <a href="{{ route('blogs.index') }}" class="block px-4 py-2 text-sm font-bold text-slate-200 hover:bg-white/10 rounded-xl">Blog</a>
+            <a href="{{ route('home') }}" class="block px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100 rounded-xl">Home</a>
+            <a href="{{ route('jobs.index') }}" class="block px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100 rounded-xl">Find Jobs</a>
+            <a href="{{ route('categories.index') }}" class="block px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100 rounded-xl">Job Categories</a>
+            <a href="{{ route('employers.public') }}" class="block px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100 rounded-xl">Employers</a>
+            <a href="{{ route('seekers.public') }}" class="block px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100 rounded-xl">Job Seekers</a>
+            <a href="{{ route('blogs.index') }}" class="block px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100 rounded-xl">Blog</a>
             
-            <div class="border-t border-white/10 pt-3 mt-3 px-4 flex flex-col gap-2">
+            <div class="border-t border-slate-200 pt-3 mt-3 px-4 flex flex-col gap-2">
                 @auth
                     @php $user = auth()->user(); @endphp
                     <a href="{{ $user->hasRole('super-admin') ? route('admin.dashboard') : ($user->hasRole('employer') ? route('employer.dashboard') : route('seeker.dashboard')) }}" class="btn btn-primary btn-sm w-full text-center font-bold">
                         Dashboard
                     </a>
                 @else
-                    <a href="{{ route('login') }}" class="btn btn-outline btn-sm w-full text-center border-white/30 text-white font-bold">
+                    <a href="{{ route('login') }}" class="btn btn-outline btn-sm w-full text-center border-slate-300 text-slate-800 font-bold">
                         Sign In
                     </a>
                     <a href="{{ route('register.seeker') }}" class="btn btn-primary btn-sm w-full text-center font-bold">
