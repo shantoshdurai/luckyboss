@@ -275,11 +275,7 @@
                         <svg x-show="sidebarOpen" :class="openDropdowns.settings ? 'rotate-180' : ''" class="w-3.5 h-3.5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                     <div x-show="openDropdowns.settings && sidebarOpen" x-cloak class="mt-1 pl-9 pr-2 space-y-1 text-xs border-l-2 border-slate-200 ml-5">
-                        <a href="{{ route('admin.site-settings.edit') }}" class="block py-1.5 px-2 rounded-lg text-secondary-600 hover:text-navy font-bold">Branding, Logo & SEO</a>
-                        <a href="{{ route('admin.site-settings.edit') }}" class="block py-1.5 px-2 rounded-lg text-rose-600 hover:text-rose-700 hover:bg-rose-50 font-bold flex items-center gap-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                            <span>Gmail SMTP Settings</span>
-                        </a>
+                        <a href="{{ route('admin.site-settings.edit') }}" class="block py-1.5 px-2 rounded-lg text-slate-600 hover:text-navy hover:bg-slate-100 font-medium">Branding, Logo & SEO</a>
                         <a href="{{ route('admin.control-center.index', ['section' => 'users-permissions', 'view' => 'admin-users']) }}" class="block py-1.5 px-2 rounded-lg text-slate-600 hover:text-navy hover:bg-slate-100 font-medium">Admin Users & Roles</a>
                         <a href="{{ route('admin.control-center.index', ['section' => 'audit-logs', 'view' => 'admin-activity']) }}" class="block py-1.5 px-2 rounded-lg text-slate-600 hover:text-navy hover:bg-slate-100 font-medium">Security & Audit Logs</a>
                     </div>
