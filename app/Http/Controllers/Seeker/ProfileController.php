@@ -30,16 +30,13 @@ class ProfileController extends Controller
                 ? $profile->resume_data['skills'] 
                 : array_filter(array_map('trim', explode(',', (string) $profile->resume_data['skills'])));
         }
-        if (empty($skills)) {
-            $skills = ['Warehouse Operations', 'Inventory Management', 'SAP ERP', 'Safety Compliance', 'Logistics Management'];
-        }
 
         $initialData = [
-            'currentTitle' => (string) ($profile?->current_title ?: 'Warehouse Supervisor'),
-            'yearsExperience' => (int) ($profile?->years_experience ?: 4),
+            'currentTitle' => (string) ($profile?->current_title ?: ''),
+            'yearsExperience' => (int) ($profile?->years_experience ?? 0),
             'professionalSummary' => (string) ($profile?->professional_summary ?: ''),
             'currentLocation' => (string) ($profile?->current_location ?: 'Singapore'),
-            'expectedSalary' => (int) ($profile?->expected_salary ?: 3500),
+            'expectedSalary' => (int) ($profile?->expected_salary ?: 0),
             'noticePeriod' => (string) ($profile?->notice_period ?: 'Immediate / 1 Month'),
             'skills' => array_values(array_unique($skills)),
         ];

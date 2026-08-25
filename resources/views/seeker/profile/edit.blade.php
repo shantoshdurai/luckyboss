@@ -11,11 +11,11 @@
                 fullName: '{{ addslashes($user->name) }}',
                 phone: '{{ addslashes($user->phone ?? "") }}',
                 email: '{{ addslashes($user->email) }}',
-                currentTitle: initialProfileData.currentTitle || 'Warehouse Supervisor',
-                yearsExperience: initialProfileData.yearsExperience ?? 4,
+                currentTitle: initialProfileData.currentTitle || '',
+                yearsExperience: initialProfileData.yearsExperience ?? 0,
                 professionalSummary: initialProfileData.professionalSummary || '',
                 currentLocation: initialProfileData.currentLocation || 'Singapore',
-                expectedSalary: initialProfileData.expectedSalary || 3500,
+                expectedSalary: initialProfileData.expectedSalary || '',
                 noticePeriod: initialProfileData.noticePeriod || 'Immediate / 1 Month',
                 
                 masterCatalog: [
@@ -27,7 +27,7 @@
                     'Hotel Front Desk', 'Food & Beverage Service', 'Culinary Operations', 'Food Hygiene (HACCP)', 'Retail Store Operations', 'Point of Sale (POS)', 'Visual Merchandising', 'Event Coordination'
                 ],
 
-                skillsList: Array.isArray(initialProfileData.skills) ? Array.from(initialProfileData.skills) : ['Warehouse Operations', 'Inventory Management', 'SAP ERP', 'Safety Compliance', 'Logistics Management'],
+                skillsList: Array.isArray(initialProfileData.skills) ? Array.from(initialProfileData.skills) : [],
                 searchQuery: '',
                 showDropdown: false,
 
