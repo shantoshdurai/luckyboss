@@ -54,13 +54,24 @@
                                     Stage: {{ $application->status }}
                                 </span>
                                 @if(!in_array($application->status, ['Hired', 'Rejected', 'Withdrawn']))
-                                    <form method="POST" action="{{ route('seeker.applications.withdraw', $application) }}" onsubmit="return confirm('Withdraw this application?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-outline btn-sm text-xs text-rose-600 hover:bg-rose-50 border-rose-200 cursor-pointer">
+                                    <div x-data="{ confirming: false }" class="flex items-center">
+                                        <button x-show="!confirming" @click="confirming = true" type="button" class="btn btn-outline btn-sm text-xs text-rose-600 hover:bg-rose-50 border-rose-200 cursor-pointer">
                                             Withdraw
                                         </button>
-                                    </form>
+                                        <div x-show="confirming" x-cloak class="flex items-center gap-1.5 bg-rose-50 p-1 rounded-xl border border-rose-200">
+                                            <span class="text-[11px] font-bold text-rose-800 pl-1.5">Withdraw?</span>
+                                            <form method="POST" action="{{ route('seeker.applications.withdraw', $application) }}" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold shadow-xs cursor-pointer">
+                                                    Yes
+                                                </button>
+                                            </form>
+                                            <button @click="confirming = false" type="button" class="px-2 py-1 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 text-[11px] font-semibold cursor-pointer">
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
                                 @endif
                             </div>
                         </div>

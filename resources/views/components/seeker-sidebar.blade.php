@@ -22,7 +22,7 @@
                     <img 
                         src="{{ asset('images/lucky-boss-logo-transparent.png') }}" 
                         alt="Lucky Boss" 
-                        class="h-11 w-auto max-h-12 object-contain"
+                        class="h-12 sm:h-13 w-auto max-h-14 object-contain"
                     >
                 </a>
             </div>

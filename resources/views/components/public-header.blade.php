@@ -10,14 +10,14 @@
     class="sticky top-0 z-50 transition-all duration-300 text-slate-800"
 >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-20 lg:h-22 gap-4">
+        <div class="flex items-center justify-between h-22 lg:h-24 gap-4">
             {{-- Brand Logo (Enlarged & Crystal Clear on White Background) --}}
-            <a href="{{ route('home') }}" class="flex items-center py-1.5 flex-shrink-0 group">
+            <a href="{{ route('home') }}" class="flex items-center py-2 flex-shrink-0 group">
                 <div class="relative py-1 flex items-center">
                     <img 
                         src="{{ asset('images/lucky-boss-logo-transparent.png') }}" 
                         alt="Lucky Boss" 
-                        class="h-13 sm:h-15 lg:h-16 w-auto max-h-16 object-contain transition-transform duration-200 group-hover:scale-103"
+                        class="h-15 sm:h-17 lg:h-18 w-auto max-h-20 object-contain transition-transform duration-200 group-hover:scale-103"
                     >
                 </div>
             </a>
