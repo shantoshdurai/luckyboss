@@ -12,6 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->validateCsrfTokens(except: [
+            'notifications/clear-all',
+            'notifications/mark-all-read',
+            'api/*',
+        ]);
         $middleware->alias(['feature' => \App\Http\Middleware\EnsureFeatureEnabled::class, 'permission' => \App\Http\Middleware\EnsurePermission::class, 'subscription' => \App\Http\Middleware\SubscriptionCheck::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
