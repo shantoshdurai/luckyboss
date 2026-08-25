@@ -2,21 +2,24 @@
     <script>
         const initialProfileData = {!! $initialDataJson !!};
 
-        function candidateProfileEditor() {
+                function candidateProfileEditor() {
             return {
                 entryMode: 'ai',
                 fileName: '',
                 isParsing: false,
                 parseMessage: '',
+                fullName: '{{ addslashes($user->name) }}',
+                phone: '{{ addslashes($user->phone ?? "") }}',
+                email: '{{ addslashes($user->email) }}',
                 currentTitle: initialProfileData.currentTitle || 'Warehouse Supervisor',
-                yearsExperience: initialProfileData.yearsExperience || 4,
+                yearsExperience: initialProfileData.yearsExperience ?? 4,
                 professionalSummary: initialProfileData.professionalSummary || '',
                 currentLocation: initialProfileData.currentLocation || 'Singapore',
                 expectedSalary: initialProfileData.expectedSalary || 3500,
                 noticePeriod: initialProfileData.noticePeriod || 'Immediate / 1 Month',
                 
                 masterCatalog: [
-                    'Python', 'Flutter', 'React', 'React Native', 'Node.js', 'JavaScript', 'TypeScript', 'PHP', 'Laravel', 'Java', 'C++', 'C#', '.NET', 'Go', 'Rust', 'Ruby', 'Swift', 'Kotlin', 'SQL', 'MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'Docker', 'Kubernetes', 'AWS', 'Azure', 'Google Cloud (GCP)', 'Git', 'GitHub', 'CI/CD', 'Linux', 'REST APIs', 'GraphQL', 'HTML5', 'CSS3', 'Tailwind CSS', 'Vue.js', 'Next.js', 'Angular', 'Machine Learning', 'TensorFlow', 'PyTorch', 'Data Analysis', 'Cybersecurity', 'Figma', 'UI/UX Design',
+                    'Python', 'Flutter', 'React', 'React Native', 'Node.js', 'JavaScript', 'TypeScript', 'PHP', 'Laravel', 'Java', 'C++', 'C#', '.NET', 'Go', 'Rust', 'Ruby', 'Swift', 'Kotlin', 'SQL', 'MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'Docker', 'Kubernetes', 'AWS', 'Azure', 'Google Cloud (GCP)', 'Git', 'GitHub', 'CI/CD', 'Linux', 'REST APIs', 'GraphQL', 'HTML5', 'CSS3', 'Tailwind CSS', 'Vue.js', 'Next.js', 'Angular', 'Machine Learning', 'TensorFlow', 'PyTorch', 'Data Analysis', 'Cybersecurity', 'Figma', 'UI/UX Design', 'Firebase', 'Gemini AI', 'WebSockets', 'FastApi',
                     'Warehouse Operations', 'Inventory Management', 'Logistics Management', 'Supply Chain Logistics', 'SAP ERP', 'WMS Software', 'Forklift Operation', 'Safety Compliance', 'Order Fulfillment', 'Material Handling', 'Freight Forwarding', 'Customs Clearance', 'Stock Auditing', 'Procurement', 'Fleet Management', 'Supply Chain Optimization', 'ISO 9001 Standards',
                     'Construction Site Supervision', 'AutoCAD', 'BIM Modeling', 'Structural Engineering', 'Civil Engineering', 'Electrical Engineering', 'Mechanical Engineering', 'HVAC Systems', 'Project Management', 'Contract Administration', 'Quantity Surveying', 'Welding & Fabrication', 'CNC Machining', 'Quality Assurance (QA/QC)', 'Lean Manufacturing', 'Six Sigma',
                     'Patient Care', 'Clinical Nursing', 'First Aid & CPR', 'Medical Records Management', 'Phlebotomy', 'Geriatric Care', 'Infection Control', 'Medication Administration', 'Healthcare Administration',
@@ -54,7 +57,7 @@
                     if (!file) return;
                     this.fileName = file.name;
                     this.isParsing = true;
-                    this.parseMessage = 'AI is extracting skills, experience, and profile details...';
+                    this.parseMessage = 'AI Multimodal Vision is extracting your resume details...';
 
                     const formData = new FormData();
                     formData.append('resume_file', file);
@@ -73,18 +76,21 @@
                         const res = await response.json();
                         if (res.status === 'success' && res.data) {
                             const d = res.data;
+                            if (d.name && d.name.trim().length > 0) this.fullName = d.name;
+                            if (d.phone && d.phone.trim().length > 0) this.phone = d.phone;
+                            if (d.email && d.email.trim().length > 0) this.email = d.email;
                             if (d.title) this.currentTitle = d.title;
-                            if (d.years_experience) this.yearsExperience = d.years_experience;
+                            if (d.years_experience !== undefined) this.yearsExperience = d.years_experience;
                             if (d.summary) this.professionalSummary = d.summary;
                             if (d.current_location) this.currentLocation = d.current_location;
                             if (d.expected_salary) this.expectedSalary = d.expected_salary;
                             if (d.notice_period) this.noticePeriod = d.notice_period;
-                            if (d.skills && Array.isArray(d.skills)) {
-                                d.skills.forEach(s => {
-                                    if (!this.skillsList.includes(s)) this.skillsList.push(s);
-                                });
+
+                            if (d.skills && Array.isArray(d.skills) && d.skills.length > 0) {
+                                // Populate extracted skills
+                                this.skillsList = d.skills;
                             }
-                            this.parseMessage = '✓ Successfully extracted & auto-filled from resume!';
+                            this.parseMessage = '✓ Successfully extracted with AI! Check your updated fields below.';
                         } else {
                             this.parseMessage = 'Resume file attached. Review details below.';
                         }
@@ -279,7 +285,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-navy mb-1.5">Full Name *</label>
-                        <input type="text" name="name" value="{{ old('name', $user->name) }}" class="input w-full" required>
+                        <input type="text" name="name" x-model="fullName" value="{{ old('name', $user->name) }}" class="input w-full" required>
                     </div>
 
                     <div>
@@ -289,12 +295,12 @@
 
                     <div>
                         <label class="block text-xs font-bold text-navy mb-1.5">Email Address *</label>
-                        <input type="email" name="email" value="{{ old('email', $user->email) }}" class="input w-full" required>
+                        <input type="email" name="email" x-model="email" value="{{ old('email', $user->email) }}" class="input w-full" required>
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-navy mb-1.5">Phone Number *</label>
-                        <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" class="input w-full" required>
+                        <input type="text" name="phone" x-model="phone" value="{{ old('phone', $user->phone) }}" class="input w-full" required>
                     </div>
 
                     <div>
