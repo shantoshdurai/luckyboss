@@ -17,7 +17,7 @@
 Before running the project, ensure you have the following installed on your machine:
 * **PHP >= 8.2** (Extensions required: `pdo_sqlite`, `mbstring`, `openssl`, `curl`, `fileinfo`, `tokenizer`)
 * **Composer >= 2.2**
-* **Node.js >= 18.x** & **npm >= 9.x**
+*(Note: Node.js/npm is NOT required! All frontend styles and JavaScript are pre-bundled and ready to serve).*
 
 ---
 
@@ -47,13 +47,7 @@ The SQLite database is pre-configured. Run migrations and the seeders to populat
 php artisan migrate:fresh --seed
 ```
 
-### 5. Compile Frontend Assets
-```bash
-npm install
-npm run build
-```
-
-### 6. Start the Development Server
+### 5. Start the Development Server
 ```bash
 php artisan serve --host=127.0.0.1 --port=8000
 ```

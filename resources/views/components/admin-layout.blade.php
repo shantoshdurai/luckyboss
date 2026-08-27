@@ -6,8 +6,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title }} — Lucky Boss Admin</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if(file_exists(public_path('build/manifest.json')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @else
+        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+        <script defer src="{{ asset('js/app.js') }}"></script>
+    @endif
 </head>
 <body class="min-h-screen bg-[#f8fafc] text-text-primary antialiased" x-data="{ 
     sidebarOpen: true, 
