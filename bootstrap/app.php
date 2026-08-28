@@ -17,7 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'notifications/mark-all-read',
             'api/*',
         ]);
-        $middleware->alias(['feature' => \App\Http\Middleware\EnsureFeatureEnabled::class, 'permission' => \App\Http\Middleware\EnsurePermission::class, 'subscription' => \App\Http\Middleware\SubscriptionCheck::class]);
+        $middleware->alias(['feature' => \App\Http\Middleware\EnsureFeatureEnabled::class, 'permission' => \App\Http\Middleware\EnsurePermission::class, 'subscription' => \App\Http\Middleware\SubscriptionCheck::class, 'demo.readonly' => \App\Http\Middleware\BlockDemoWrites::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

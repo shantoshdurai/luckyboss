@@ -26,6 +26,7 @@ class User extends Authenticatable
         'phone',
         'country_code',
         'is_active',
+        'is_demo',
     ];
 
     /**
@@ -49,6 +50,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'is_demo' => 'boolean',
         ];
     }
 
