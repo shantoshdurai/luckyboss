@@ -43,6 +43,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', HomeController::class)->name('home');
 Route::get('/jobs', [PublicPortalController::class,'jobs'])->name('jobs.index');
 Route::get('/jobs/{job}', [PublicPortalController::class, 'show'])->whereNumber('job')->name('jobs.show');
+
+// Discovery for Google for Jobs. Generated on request so a closed vacancy is
+// never left in it — a sitemap full of dead URLs costs crawl budget.
+Route::get('/sitemap.xml', \App\Http\Controllers\SitemapController::class)->name('sitemap');
 Route::get('/jobs/suggestions', [PublicPortalController::class,'suggestions'])->name('jobs.suggestions');
 Route::get('/job-categories', [PublicPortalController::class,'categories'])->name('categories.index');
 Route::get('/specializations', fn() => redirect()->route('categories.index'))->name('specializations.index');

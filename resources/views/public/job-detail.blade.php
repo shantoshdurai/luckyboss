@@ -1,4 +1,8 @@
 <x-layouts.app :title="$job->title . ' | ' . ($job->company->name ?? 'Luckyboss')" :description="Str::limit(strip_tags($job->description), 155)" :image="asset($job->image_path)" :imageAlt="$job->title">
+
+{{-- Google for Jobs. Without this block every vacancy here is invisible to the
+     largest free source of candidate traffic in all three markets. --}}
+<script type="application/ld+json">@json(app(\App\Services\JobPostingSchema::class)->for($job), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)</script>
     <article class="bg-slate-50 min-h-screen">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
             <a href="{{ route('jobs.index') }}" class="inline-flex items-center gap-2 text-sm font-bold text-navy hover:text-accent transition-colors mb-6">&larr; Back to Jobs</a>
