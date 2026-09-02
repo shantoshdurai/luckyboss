@@ -136,10 +136,6 @@ class FirebaseAuthController extends Controller
         }
 
         if ($user !== null) {
-            if ($user->is_demo) {
-                throw new RuntimeException('The shared demo account cannot be linked to a personal sign-in.');
-            }
-
             $user->forceFill([
                 'firebase_uid' => $uid,
                 'auth_provider' => $provider,

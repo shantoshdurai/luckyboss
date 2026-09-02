@@ -25,8 +25,6 @@ Route::prefix('v1')->group(function (): void {
     Route::post('/webhooks/payments/{gateway}', [WebhookController::class,'payment'])->middleware('throttle:30,1');
     Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
     Route::post('/auth/job-seekers/register', [AuthController::class, 'registerSeeker']);
-    // Read-only demo sign-in for the mobile "See how it works" button.
-    Route::post('/auth/demo', [AuthController::class, 'demo'])->middleware('throttle:10,1');
     Route::post('/auth/employers/register', [AuthController::class, 'registerEmployer']);
     // Firebase sign-in (Google / phone OTP) exchanged for a Sanctum token.
     // Both mobile apps post here; the `app` field scopes the issued token.
@@ -44,10 +42,7 @@ Route::prefix('v1')->group(function (): void {
     Route::post('/jobs', [PortalController::class, 'postEmployerJob']);
     Route::post('/employer/jobs', [PortalController::class, 'postEmployerJob']);
 
-    // demo.readonly refuses POST/PUT/PATCH/DELETE from the demo account. It sits
-    // on the group rather than on individual routes so a future write endpoint is
-    // covered by default instead of being forgotten (spec section 93).
-    Route::middleware(['auth:sanctum', 'demo.readonly'])->group(function (): void {
+    Route::middleware('auth:sanctum')->group(function (): void {
         Route::get('/navigation', NavigationController::class);
         Route::get('/job-seeker/dashboard', [PortalController::class, 'seekerDashboard']);
         // The profile the app reads on launch and writes on every edit. Without

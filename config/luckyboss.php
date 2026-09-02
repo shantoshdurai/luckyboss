@@ -2,23 +2,6 @@
 
 return [
 
-    /*
-    |---------------------------------------------------------------------------
-    | Public demo account
-    |---------------------------------------------------------------------------
-    |
-    | Powers the "See how it works" button on the mobile sign-in screen. The
-    | account is a real, seeded, read-only candidate — writes are refused by the
-    | BlockDemoWrites middleware, not by hiding buttons in the app.
-    |
-    | Set LUCKYBOSS_DEMO_ENABLED=false in production if the demo should not be
-    | reachable there; POST /api/v1/auth/demo then returns 404.
-    |
-    */
-
-    'demo_account_enabled' => env('LUCKYBOSS_DEMO_ENABLED', true),
-
-    'demo_email' => env('LUCKYBOSS_DEMO_EMAIL', 'candidate@luckyboss.test'),
 
     /*
     |---------------------------------------------------------------------------
