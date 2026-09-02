@@ -1,4 +1,4 @@
-<x-layouts.app title="Industry Specializations — Lucky Boss Portal">
+<x-layouts.app title="Industry Specializations — Luckyboss Portal">
     {{-- Header Banner --}}
     <section class="bg-gradient-to-br from-navy via-primary-800 to-accent text-white py-14 lg:py-20 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-80 h-80 bg-secondary-500/20 rounded-full blur-3xl"></div>

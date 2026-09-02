@@ -11,7 +11,7 @@ class JobController extends Controller
 {
     public function index(Request $request)
     {
-        $jobs = Job::with('company')->where('status', 'published')
+        $jobs = Job::with(['company', 'jobCategory'])->where('status', 'published')
             ->when($request->string('keyword')->toString(), fn ($query, $keyword) => $query->where('title', 'like', "%{$keyword}%"))
             ->when($request->string('country')->toString(), fn ($query, $country) => $query->where('country_code', $country))
             ->latest('published_at')->paginate(15);

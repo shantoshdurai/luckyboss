@@ -1,4 +1,4 @@
-<x-layouts.app title="Career Intelligence & Recruitment Blog | Lucky Boss Portal">
+<x-layouts.app title="Career Intelligence & Recruitment Blog | Luckyboss Portal">
     {{-- Top Banner --}}
     <section class="bg-gradient-to-b from-[#031533] via-[#041d45] to-[#031533] text-white py-16 lg:py-20 relative overflow-hidden">
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-secondary-500/10 rounded-full blur-[100px] pointer-events-none"></div>
@@ -61,7 +61,7 @@
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                     <span>{{ $blog->published_at ? $blog->published_at->format('M d, Y') : 'Recent Post' }}</span>
                                     <span>•</span>
-                                    <span>{{ $blog->author ?? 'Lucky Boss Editorial' }}</span>
+                                    <span>{{ $blog->author ?? 'Luckyboss Editorial' }}</span>
                                 </div>
 
                                 <h2 class="text-xl font-heading font-bold text-navy mb-2.5 group-hover:text-accent transition-colors leading-snug">

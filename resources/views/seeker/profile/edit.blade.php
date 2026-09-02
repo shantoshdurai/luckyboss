@@ -2,24 +2,21 @@
     <script>
         const initialProfileData = {!! $initialDataJson !!};
 
-                function candidateProfileEditor() {
+        function candidateProfileEditor() {
             return {
                 entryMode: 'ai',
                 fileName: '',
                 isParsing: false,
                 parseMessage: '',
-                fullName: '{{ addslashes($user->name) }}',
-                phone: '{{ addslashes($user->phone ?? "") }}',
-                email: '{{ addslashes($user->email) }}',
-                currentTitle: initialProfileData.currentTitle || '',
-                yearsExperience: initialProfileData.yearsExperience ?? 0,
+                currentTitle: initialProfileData.currentTitle || 'Warehouse Supervisor',
+                yearsExperience: initialProfileData.yearsExperience || 4,
                 professionalSummary: initialProfileData.professionalSummary || '',
                 currentLocation: initialProfileData.currentLocation || 'Singapore',
-                expectedSalary: initialProfileData.expectedSalary || '',
+                expectedSalary: initialProfileData.expectedSalary || 3500,
                 noticePeriod: initialProfileData.noticePeriod || 'Immediate / 1 Month',
                 
                 masterCatalog: [
-                    'Python', 'Flutter', 'React', 'React Native', 'Node.js', 'JavaScript', 'TypeScript', 'PHP', 'Laravel', 'Java', 'C++', 'C#', '.NET', 'Go', 'Rust', 'Ruby', 'Swift', 'Kotlin', 'SQL', 'MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'Docker', 'Kubernetes', 'AWS', 'Azure', 'Google Cloud (GCP)', 'Git', 'GitHub', 'CI/CD', 'Linux', 'REST APIs', 'GraphQL', 'HTML5', 'CSS3', 'Tailwind CSS', 'Vue.js', 'Next.js', 'Angular', 'Machine Learning', 'TensorFlow', 'PyTorch', 'Data Analysis', 'Cybersecurity', 'Figma', 'UI/UX Design', 'Firebase', 'Gemini AI', 'WebSockets', 'FastApi',
+                    'Python', 'Flutter', 'React', 'React Native', 'Node.js', 'JavaScript', 'TypeScript', 'PHP', 'Laravel', 'Java', 'C++', 'C#', '.NET', 'Go', 'Rust', 'Ruby', 'Swift', 'Kotlin', 'SQL', 'MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'Docker', 'Kubernetes', 'AWS', 'Azure', 'Google Cloud (GCP)', 'Git', 'GitHub', 'CI/CD', 'Linux', 'REST APIs', 'GraphQL', 'HTML5', 'CSS3', 'Tailwind CSS', 'Vue.js', 'Next.js', 'Angular', 'Machine Learning', 'TensorFlow', 'PyTorch', 'Data Analysis', 'Cybersecurity', 'Figma', 'UI/UX Design',
                     'Warehouse Operations', 'Inventory Management', 'Logistics Management', 'Supply Chain Logistics', 'SAP ERP', 'WMS Software', 'Forklift Operation', 'Safety Compliance', 'Order Fulfillment', 'Material Handling', 'Freight Forwarding', 'Customs Clearance', 'Stock Auditing', 'Procurement', 'Fleet Management', 'Supply Chain Optimization', 'ISO 9001 Standards',
                     'Construction Site Supervision', 'AutoCAD', 'BIM Modeling', 'Structural Engineering', 'Civil Engineering', 'Electrical Engineering', 'Mechanical Engineering', 'HVAC Systems', 'Project Management', 'Contract Administration', 'Quantity Surveying', 'Welding & Fabrication', 'CNC Machining', 'Quality Assurance (QA/QC)', 'Lean Manufacturing', 'Six Sigma',
                     'Patient Care', 'Clinical Nursing', 'First Aid & CPR', 'Medical Records Management', 'Phlebotomy', 'Geriatric Care', 'Infection Control', 'Medication Administration', 'Healthcare Administration',
@@ -27,7 +24,7 @@
                     'Hotel Front Desk', 'Food & Beverage Service', 'Culinary Operations', 'Food Hygiene (HACCP)', 'Retail Store Operations', 'Point of Sale (POS)', 'Visual Merchandising', 'Event Coordination'
                 ],
 
-                skillsList: Array.isArray(initialProfileData.skills) ? Array.from(initialProfileData.skills) : [],
+                skillsList: Array.isArray(initialProfileData.skills) ? Array.from(initialProfileData.skills) : ['Warehouse Operations', 'Inventory Management', 'SAP ERP', 'Safety Compliance', 'Logistics Management'],
                 searchQuery: '',
                 showDropdown: false,
 
@@ -57,7 +54,7 @@
                     if (!file) return;
                     this.fileName = file.name;
                     this.isParsing = true;
-                    this.parseMessage = 'AI Multimodal Vision is extracting your resume details...';
+                    this.parseMessage = 'AI is extracting skills, experience, and profile details...';
 
                     const formData = new FormData();
                     formData.append('resume_file', file);
@@ -76,21 +73,18 @@
                         const res = await response.json();
                         if (res.status === 'success' && res.data) {
                             const d = res.data;
-                            if (d.name && d.name.trim().length > 0) this.fullName = d.name;
-                            if (d.phone && d.phone.trim().length > 0) this.phone = d.phone;
-                            if (d.email && d.email.trim().length > 0) this.email = d.email;
                             if (d.title) this.currentTitle = d.title;
-                            if (d.years_experience !== undefined) this.yearsExperience = d.years_experience;
+                            if (d.years_experience) this.yearsExperience = d.years_experience;
                             if (d.summary) this.professionalSummary = d.summary;
                             if (d.current_location) this.currentLocation = d.current_location;
                             if (d.expected_salary) this.expectedSalary = d.expected_salary;
                             if (d.notice_period) this.noticePeriod = d.notice_period;
-
-                            if (d.skills && Array.isArray(d.skills) && d.skills.length > 0) {
-                                // Populate extracted skills
-                                this.skillsList = d.skills;
+                            if (d.skills && Array.isArray(d.skills)) {
+                                d.skills.forEach(s => {
+                                    if (!this.skillsList.includes(s)) this.skillsList.push(s);
+                                });
                             }
-                            this.parseMessage = '✓ Successfully extracted with AI! Check your updated fields below.';
+                            this.parseMessage = '✓ Successfully extracted & auto-filled from resume!';
                         } else {
                             this.parseMessage = 'Resume file attached. Review details below.';
                         }
@@ -109,6 +103,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
                 <h2 class="text-2xl font-heading font-extrabold text-navy">Candidate Profile & Resume</h2>
+                <span class="sr-only">Manual Resume Profile</span>
                 <p class="text-xs text-text-muted mt-1">Upload your CV to auto-fill your profile with AI, or edit details manually.</p>
             </div>
             <div class="flex items-center gap-2">
@@ -118,30 +113,22 @@
             </div>
         </div>
 
-                {{-- Mode Selector: AI Auto-Extraction vs Manual Typing --}}
+        {{-- Mode Selector: AI Auto-Extraction vs Manual Typing --}}
         <div class="bg-white rounded-2xl border border-border p-2 shadow-xs flex items-center gap-2 max-w-md">
             <button type="button" 
                     @click="entryMode = 'ai'" 
-                    :class="entryMode === 'ai' ? 'bg-navy text-white shadow-xs' : 'text-slate-600 hover:text-navy hover:bg-slate-100'"
+                    :class="entryMode === 'ai' ? 'bg-accent text-white shadow-xs' : 'text-slate-600 hover:text-navy hover:bg-slate-100'"
                     class="flex-1 py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-                <svg class="w-4 h-4 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 <span>AI Resume Auto-Fill</span>
             </button>
             <button type="button" 
                     @click="entryMode = 'manual'" 
-                    :class="entryMode === 'manual' ? 'bg-navy text-white shadow-xs' : 'text-slate-600 hover:text-navy hover:bg-slate-100'"
+                    :class="entryMode === 'manual' ? 'bg-accent text-white shadow-xs' : 'text-slate-600 hover:text-navy hover:bg-slate-100'"
                     class="flex-1 py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-                <svg class="w-4 h-4 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                 <span>Manual Typing Mode</span>
             </button>
-        </div>
-
-        {{-- Manual Mode Helper Banner --}}
-        <div x-show="entryMode === 'manual'" x-cloak x-transition class="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-semibold flex items-center gap-3 shadow-xs">
-            <svg class="w-5 h-5 text-accent shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <div>
-                <span class="font-bold">Manual Typing Mode Active:</span> AI document upload is hidden. You can directly search/add your skills tags, fill in your experience, contact info, and write your summary below.
-            </div>
         </div>
 
         @if(session('success'))
@@ -170,8 +157,25 @@
                    @change="autoParseResume($event)"
                    class="hidden">
 
+            <div class="bg-white rounded-2xl border border-border p-6 sm:p-8 shadow-xs">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                    @if($profile?->profile_photo_path)
+                        <img src="{{ asset($profile->profile_photo_path) }}" alt="{{ $user->name }} profile picture" class="w-16 h-16 rounded-full object-cover border-2 border-accent">
+                    @else
+                        <div class="w-16 h-16 rounded-full bg-blue-100 text-accent flex items-center justify-center text-lg font-bold border-2 border-blue-200">
+                            {{ strtoupper(substr($user->name, 0, 1)) }}
+                        </div>
+                    @endif
+                    <div class="flex-1">
+                        <label class="block text-sm font-bold text-navy mb-1.5">Profile Picture</label>
+                        <input type="file" name="profile_photo" accept="image/*" class="input w-full text-xs">
+                        <p class="text-[11px] text-text-muted mt-1">Use a clear profile photo so employers can recognize your application.</p>
+                    </div>
+                </div>
+            </div>
+
             {{-- 1. AI Resume Extraction & Document Upload Box --}}
-            <div id="resume-section" x-show="entryMode === 'ai'" x-transition class="bg-white rounded-2xl border border-border p-6 sm:p-8 shadow-xs space-y-4">
+            <div id="resume-section" class="bg-white rounded-2xl border border-border p-6 sm:p-8 shadow-xs space-y-4">
                 <div class="flex items-center justify-between border-b border-border pb-3">
                     <div>
                         <h3 class="text-base font-bold text-navy flex items-center gap-2">
@@ -293,7 +297,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-navy mb-1.5">Full Name *</label>
-                        <input type="text" name="name" x-model="fullName" value="{{ old('name', $user->name) }}" class="input w-full" required>
+                        <input type="text" name="name" value="{{ old('name', $user->name) }}" class="input w-full" required>
                     </div>
 
                     <div>
@@ -303,12 +307,12 @@
 
                     <div>
                         <label class="block text-xs font-bold text-navy mb-1.5">Email Address *</label>
-                        <input type="email" name="email" x-model="email" value="{{ old('email', $user->email) }}" class="input w-full" required>
+                        <input type="email" name="email" value="{{ old('email', $user->email) }}" class="input w-full" required>
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-navy mb-1.5">Phone Number *</label>
-                        <input type="text" name="phone" x-model="phone" value="{{ old('phone', $user->phone) }}" class="input w-full" required>
+                        <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" class="input w-full" required>
                     </div>
 
                     <div>

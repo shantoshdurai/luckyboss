@@ -1,4 +1,4 @@
-<x-admin-layout :title="str($view)->headline() . ' | Lucky Boss Admin'" :heading="str($view)->headline()">
+<x-admin-layout :title="str($view)->headline() . ' | Luckyboss Admin'" :heading="str($view)->headline()">
     <div class="space-y-6">
         {{-- Top Navigation & Subtabs --}}
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-border shadow-xs">

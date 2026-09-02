@@ -1,4 +1,4 @@
-<x-layouts.app title="Modern Job Opportunities List — Lucky Boss">
+<x-layouts.app title="Modern Job Opportunities List — Luckyboss">
     {{-- Header Hero Banner --}}
     <section class="bg-gradient-to-br from-navy via-[#062456] to-[#031533] text-white py-12 lg:py-16 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-96 h-96 bg-secondary-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -221,7 +221,7 @@
                                         {{-- Top Row: Job Title --}}
                                         <div class="flex items-center gap-3">
                                             <h3 class="text-lg font-bold text-navy group-hover:text-accent transition-colors">
-                                                <a href="{{ route('jobs.index') }}">{{ $job->title }}</a>
+                                                <a href="{{ route('jobs.show', $job) }}">{{ $job->title }}</a>
                                             </h3>
                                         </div>
 
@@ -283,18 +283,9 @@
                                                 <span>Applied &bull; Track Status</span>
                                             </a>
                                         @else
-                                            @auth
-                                                <form method="POST" action="{{ route('seeker.jobs.apply', $job) }}">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-primary py-2.5 px-6 text-xs font-bold shadow-md cursor-pointer hover:scale-102 transition-transform">
-                                                        View & Apply
-                                                    </button>
-                                                </form>
-                                            @else
-                                                <a href="{{ route('login') }}" class="btn btn-primary py-2.5 px-6 text-xs font-bold shadow-md">
-                                                    View & Apply
-                                                </a>
-                                            @endauth
+                                            <a href="{{ route('jobs.show', $job) }}" class="btn btn-primary py-2.5 px-6 text-xs font-bold shadow-md">
+                                                View & Apply
+                                            </a>
                                         @endif
                                     </div>
                                 </div>

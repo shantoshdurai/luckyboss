@@ -1,4 +1,4 @@
-<x-admin-layout title="Employer Users | Lucky Boss Admin" heading="Employer Users">
+<x-admin-layout title="Employer Users | Luckyboss Admin" heading="Employer Users">
     <p style="color:#667085">Review employer accounts and enable or disable their company access.</p>
     @if(session('success'))<p style="color:#027a48;font-weight:700">{{ session('success') }}</p>@endif
     <form method="GET" class="admin-card" style="display:grid;grid-template-columns:2fr 1fr auto;gap:12px;padding:16px;margin:18px 0"><input class="admin-input" style="margin:0" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Search user name or email"><select class="admin-input" style="margin:0" name="company_id"><option value="">All companies</option>@foreach($companies as $company)<option value="{{ $company->id }}" @selected((string)($filters['company_id'] ?? '') === (string)$company->id)>{{ $company->name }}</option>@endforeach</select><button class="admin-button">Filter</button></form>

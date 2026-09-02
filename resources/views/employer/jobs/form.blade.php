@@ -29,6 +29,15 @@
                 @endif
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-navy uppercase tracking-wider mb-2">
+                            Job Image <span class="text-red-500">*</span>
+                        </label>
+                        <input type="file" name="image" accept="image/*" {{ $job?->image_path ? '' : 'required' }} class="w-full px-4 py-3 rounded-xl border border-border text-sm text-navy">
+                        @if($job?->image_path)
+                            <img src="{{ asset($job->image_path) }}" alt="Current job image" class="mt-2 h-24 w-40 rounded-xl object-cover">
+                        @endif
+                    </div>
                     {{-- Job Title --}}
                     <div class="md:col-span-2">
                         <label class="block text-xs font-bold text-navy uppercase tracking-wider mb-2">
@@ -152,7 +161,7 @@
                         <label class="block text-xs font-bold text-navy uppercase tracking-wider mb-2">
                             Job Description & Key Responsibilities <span class="text-red-500">*</span>
                         </label>
-                        <textarea name="description" rows="6" required placeholder="Outline key tasks, deliverables, and role expectations..." class="w-full px-4 py-3 rounded-xl border border-border text-sm text-navy focus:border-navy focus:ring-1 focus:ring-navy transition-all">{{ old('description', $job?->description) }}</textarea>
+                        <textarea name="description" rows="6" maxlength="500" required placeholder="Outline key tasks, deliverables, and role expectations..." class="w-full px-4 py-3 rounded-xl border border-border text-sm text-navy focus:border-navy focus:ring-1 focus:ring-navy transition-all">{{ old('description', $job?->description) }}</textarea>
                     </div>
 
                     {{-- Requirements --}}

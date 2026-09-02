@@ -1,4 +1,4 @@
-<x-layouts.app title="Employer Solutions — Lucky Boss Portal">
+<x-layouts.app title="Employer Solutions — Luckyboss Portal">
     {{-- Hero Section --}}
     <section class="bg-gradient-to-br from-navy via-primary-800 to-green-900 text-white py-16 lg:py-24 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-96 h-96 bg-secondary-500/20 rounded-full blur-3xl"></div>

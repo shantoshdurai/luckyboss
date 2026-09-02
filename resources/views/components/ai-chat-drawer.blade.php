@@ -25,7 +25,7 @@
         <span class="font-bold text-xs sm:text-sm tracking-wide text-white" x-text="open ? 'Close Chat' : 'Ask Lucky AI'"></span>
     </button>
 
-    {{-- Floating Popup Box with Extendable Sizing --}}
+    {{-- Floating eCommerce-Style Popup Box (Bottom Right - NO BACKDROP / NO BLUR) --}}
     <div 
         x-show="open" 
         x-cloak
@@ -35,12 +35,11 @@
         x-transition:leave="transition ease-in duration-150"
         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
         x-transition:leave-end="opacity-0 translate-y-6 scale-95"
-        :class="isExpanded ? 'w-[calc(100vw-2rem)] sm:w-[620px] md:w-[680px] h-[640px] max-h-[85vh]' : 'w-[calc(100vw-2rem)] sm:w-[390px] md:w-[420px] h-[530px] max-h-[75vh]'"
-        class="fixed bottom-22 right-4 sm:right-6 bg-white rounded-3xl shadow-2xl border border-border/80 flex flex-col z-50 overflow-hidden transition-all duration-300 ease-in-out"
+        class="fixed bottom-22 right-4 sm:right-6 w-[calc(100vw-2rem)] sm:w-[380px] h-[520px] max-h-[75vh] bg-white rounded-3xl shadow-2xl border border-border/80 flex flex-col z-50 overflow-hidden"
         style="display: none;"
     >
-        {{-- Popup Header with Expand & Close Buttons --}}
-        <div class="px-5 py-3.5 bg-gradient-to-r from-navy via-primary-900 to-[#041a3d] text-white flex items-center justify-between shadow-xs shrink-0">
+        {{-- Popup Header --}}
+        <div class="px-5 py-4 bg-gradient-to-r from-navy via-primary-900 to-[#041a3d] text-white flex items-center justify-between shadow-xs shrink-0">
             <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center border border-white/20 shadow-inner shrink-0">
                     <svg class="w-5 h-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,64 +51,35 @@
                         <h3 class="font-heading font-bold text-sm leading-tight text-white">Lucky AI Copilot</h3>
                         <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-emerald-500 text-white uppercase tracking-wider">Online</span>
                     </div>
-                    <p class="text-[11px] text-blue-200/80">Recruitment & Career Intelligence</p>
+                    <p class="text-[11px] text-blue-200/80">Recruitment & Job Assistant</p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-1">
-                {{-- Expand / Compress Window Button --}}
-                <button 
-                    @click="toggleExpand()" 
-                    type="button" 
-                    class="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                    :title="isExpanded ? 'Standard Window' : 'Expand Window'"
-                >
-                    <template x-if="!isExpanded">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
-                        </svg>
-                    </template>
-                    <template x-if="isExpanded">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 4v4m0 0H5m4 0L4 3m11 5h4m-4 0V4m0 4l5-5M9 20v-4m0 0H5m4 0l-5 5m11-5l5 5m-5-5v4m0-4h4"/>
-                        </svg>
-                    </template>
-                </button>
-
-                {{-- Close Chat Button --}}
-                <button @click="open = false" type="button" class="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer" aria-label="Minimize Chat" title="Close Chat">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
+            <button @click="open = false" type="button" class="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer" aria-label="Minimize Chat">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
         </div>
 
         {{-- Messages Scroll Area --}}
-        <div id="ai-chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4 bg-[#f8fafc]">
+        <div id="ai-chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3.5 bg-[#f8fafc]">
             <template x-for="(msg, index) in messages" :key="index">
                 <div>
-                    {{-- User Message --}}
-                    <template x-if="msg.sender === 'user'">
-                        <div class="flex items-end justify-end gap-2">
-                            <div class="bg-navy text-white px-4 py-2.5 rounded-2xl rounded-tr-xs text-xs sm:text-sm font-medium shadow-xs max-w-[85%] leading-relaxed" x-text="msg.text"></div>
-                        </div>
-                    </template>
-
                     {{-- AI Message --}}
                     <template x-if="msg.sender === 'ai'">
-                        <div class="flex items-start gap-2.5" :class="isExpanded ? 'max-w-[95%]' : 'max-w-[92%]'">
+                        <div class="flex items-start gap-2.5 max-w-[92%]">
                             <div class="w-7 h-7 rounded-lg bg-navy text-secondary-400 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                             </div>
-                            <div class="space-y-2 flex-1 min-w-0">
-                                <div class="bg-white p-4 rounded-2xl rounded-tl-xs border border-border text-xs sm:text-sm text-text-primary shadow-2xs leading-relaxed font-sans" x-html="formatMessage(msg.text)"></div>
+                            <div class="space-y-2 flex-1">
+                                <div class="bg-white p-3 rounded-2xl rounded-tl-xs border border-border text-xs text-text-primary shadow-2xs leading-relaxed" x-text="msg.text"></div>
                                 
                                 {{-- Action Buttons if any --}}
                                 <template x-if="msg.actions && msg.actions.length > 0">
                                     <div class="flex flex-wrap gap-1.5 pt-0.5">
                                         <template x-for="act in msg.actions" :key="act.label">
-                                            <a :href="act.url" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-navy text-white text-xs font-semibold hover:bg-navy-light shadow-2xs transition-colors">
+                                            <a :href="act.url" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-accent text-white text-[11px] font-semibold hover:bg-accent-dark shadow-2xs transition-colors">
                                                 <span x-text="act.label"></span>
-                                                <svg class="w-3 h-3 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                                             </a>
                                         </template>
                                     </div>
@@ -118,10 +88,10 @@
                                 {{-- Suggestion Chips on welcome message --}}
                                 <template x-if="msg.suggestions && msg.suggestions.length > 0">
                                     <div class="flex flex-col gap-1.5 pt-1">
-                                        <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider">Suggested Inquiries:</span>
+                                        <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider">Suggested Questions:</span>
                                         <template x-for="sug in msg.suggestions" :key="sug">
-                                            <button @click="sendSuggestion(sug)" class="text-left px-3.5 py-2 rounded-xl bg-white hover:bg-blue-50 border border-border hover:border-accent text-xs text-text-secondary hover:text-navy font-medium transition-all shadow-2xs cursor-pointer flex items-center gap-2">
-                                                <span class="text-accent text-xs">✦</span>
+                                            <button @click="sendSuggestion(sug)" class="text-left px-3 py-1.5 rounded-xl bg-white hover:bg-blue-50 border border-border hover:border-accent text-xs text-text-secondary hover:text-accent transition-all shadow-2xs cursor-pointer flex items-center gap-1.5">
+                                                <span class="text-accent">✦</span>
                                                 <span x-text="sug" class="truncate"></span>
                                             </button>
                                         </template>
@@ -130,45 +100,47 @@
                             </div>
                         </div>
                     </template>
+
+                    {{-- User Message --}}
+                    <template x-if="msg.sender === 'user'">
+                        <div class="flex items-end justify-end gap-2 ml-auto max-w-[85%]">
+                            <div class="bg-navy text-white p-3 rounded-2xl rounded-tr-xs text-xs shadow-xs leading-relaxed" x-text="msg.text"></div>
+                        </div>
+                    </template>
                 </div>
             </template>
 
-            {{-- Typing / Generating Indicator --}}
-            <div x-show="loading" x-cloak class="flex items-center gap-2.5 max-w-[90%]">
-                <div class="w-7 h-7 rounded-lg bg-navy text-secondary-400 flex items-center justify-center shrink-0 shadow-2xs">
-                    <svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            {{-- Typing Indicator --}}
+            <div x-show="loading" class="flex items-center gap-2 text-text-muted text-[11px] p-2 bg-white rounded-xl w-fit border border-border shadow-2xs" style="display: none;">
+                <div class="flex gap-1">
+                    <span class="w-1.5 h-1.5 bg-accent rounded-full animate-bounce"></span>
+                    <span class="w-1.5 h-1.5 bg-accent rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                    <span class="w-1.5 h-1.5 bg-accent rounded-full animate-bounce [animation-delay:0.4s]"></span>
                 </div>
-                <div class="bg-white px-4 py-3 rounded-2xl rounded-tl-xs border border-border flex items-center gap-1.5 shadow-2xs">
-                    <span class="w-2 h-2 rounded-full bg-accent animate-bounce"></span>
-                    <span class="w-2 h-2 rounded-full bg-accent animate-bounce" style="animation-delay: 0.15s"></span>
-                    <span class="w-2 h-2 rounded-full bg-accent animate-bounce" style="animation-delay: 0.3s"></span>
-                </div>
+                <span>Lucky AI is typing...</span>
             </div>
         </div>
 
-        {{-- Chat Input Bar --}}
+        {{-- Popup Bottom Input Bar --}}
         <div class="p-3 bg-white border-t border-border shrink-0">
             <form @submit.prevent="sendMessage()" class="flex items-center gap-2">
                 <input 
                     type="text" 
                     x-model="input" 
-                    placeholder="Ask about jobs, salaries, hiring, resumes..." 
-                    class="flex-1 bg-surface-sunken/60 border border-border focus:border-accent focus:bg-white px-4 py-2.5 rounded-2xl text-xs sm:text-sm text-text-primary placeholder:text-text-muted outline-none transition-all"
+                    placeholder="Ask about jobs, salaries, hiring..." 
+                    class="flex-1 bg-[#f8fafc] border border-border text-text-primary text-xs rounded-xl px-3.5 py-2.5 focus:ring-1 focus:ring-accent focus:bg-white transition-all outline-none"
                     :disabled="loading"
                 >
                 <button 
                     type="submit" 
                     :disabled="!input.trim() || loading"
-                    class="w-10 h-10 rounded-2xl bg-gradient-to-r from-navy to-accent text-white flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-md transition-all cursor-pointer shrink-0"
-                    aria-label="Send Message"
+                    class="p-2.5 bg-accent hover:bg-accent-dark disabled:opacity-40 text-white rounded-xl shadow-xs transition-colors flex items-center justify-center shrink-0 cursor-pointer"
                 >
-                    <svg class="w-4 h-4 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                    </svg>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                 </button>
             </form>
-            <div class="text-center mt-1.5">
-                <span class="text-[10px] text-text-muted tracking-tight">Powered by Lucky Boss Intelligence & Gemini 2.5</span>
+            <div class="text-[9px] text-center text-text-muted mt-1.5">
+                Powered by Luckyboss Intelligence
             </div>
         </div>
     </div>

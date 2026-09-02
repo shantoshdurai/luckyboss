@@ -1,3 +1,3 @@
-<x-layouts.app :title="$title ?? 'Lucky Boss Portal'">
+<x-layouts.app :title="$title ?? 'Luckyboss Portal'">
     {{ $slot }}
 </x-layouts.app>

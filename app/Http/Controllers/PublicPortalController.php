@@ -36,7 +36,7 @@ class PublicPortalController extends Controller
 
         $user = auth()->user();
         $savedJobIds = $user ? $user->savedJobs()->pluck('job_id')->all() : [];
-        $appliedJobIds = ($user && $user->hasRole('job-seeker')) ? $user->applications()->pluck('job_id')->all() : [];
+        $appliedJobIds = ($user && $user->hasRole('job-seeker')) ? $user->applications()->where('status', '!=', 'Withdrawn')->pluck('job_id')->all() : [];
 
         return view('public.jobs', [
             'jobs' => $jobs,
@@ -54,6 +54,24 @@ class PublicPortalController extends Controller
 
         $field = $request->string('field')->toString() === 'location' ? 'location' : 'title';
         return response()->json(Job::where('status', 'published')->whereNotNull($field)->where($field, 'like', '%'.$term.'%')->orderBy($field)->limit(8)->pluck($field)->unique()->values());
+    }
+
+    public function show(Job $job): View
+    {
+        abort_unless($job->status === 'published', 404);
+
+        $application = auth()->check() && auth()->user()->hasRole('job-seeker')
+            ? auth()->user()->applications()->where('job_id', $job->id)->where('status', '!=', 'Withdrawn')->latest()->first()
+            : null;
+        $matchScore = auth()->check() && auth()->user()->hasRole('job-seeker')
+            ? (int) ($application?->match_score ?? app(\App\Services\AIRecruitmentEngineService::class)->calculateMatch($job, auth()->user())['score'] ?? 0)
+            : null;
+
+        return view('public.job-detail', [
+            'job' => $job->load('company', 'jobCategory'),
+            'application' => $application,
+            'matchScore' => $matchScore,
+        ]);
     }
 
     public function categories(): View { return view('public.categories', ['categories' => JobCategory::with('jobs')->where('is_active', true)->orderBy('sort_order')->get()]); }

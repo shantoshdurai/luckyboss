@@ -1,4 +1,4 @@
-<x-layouts.app title="{{ $page[0] }} | Lucky Boss Portal">
+<x-layouts.app title="{{ $page[0] }} | Luckyboss Portal">
     <section class="bg-gradient-to-b from-[#031533] to-[#041d45] text-white py-14 relative overflow-hidden">
         <div class="container-app max-w-4xl mx-auto text-center">
             <span class="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-bold bg-white/10 text-secondary-300 border border-white/15 mb-4">

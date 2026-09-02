@@ -42,6 +42,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('/jobs', [PublicPortalController::class,'jobs'])->name('jobs.index');
+Route::get('/jobs/{job}', [PublicPortalController::class, 'show'])->whereNumber('job')->name('jobs.show');
 Route::get('/jobs/suggestions', [PublicPortalController::class,'suggestions'])->name('jobs.suggestions');
 Route::get('/job-categories', [PublicPortalController::class,'categories'])->name('categories.index');
 Route::get('/specializations', fn() => redirect()->route('categories.index'))->name('specializations.index');
@@ -53,6 +54,9 @@ Route::get('/blog/{blog:slug}', [BlogController::class, 'show'])->name('blogs.sh
 Route::get('/pages/{page}', [PageController::class, 'show'])->where('page', 'about-us|faq|terms-and-conditions|privacy-policy|refund-policy')->name('page.show');
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('login.store');
+Route::get('/admin', [DashboardController::class, '__invoke'])->name('admin.dashboard');
+Route::get('/admin/login', [AuthController::class, 'showLogin'])->name('admin.login');
+Route::post('/admin/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('admin.login.store');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::middleware('auth')->group(function () {
@@ -60,7 +64,6 @@ Route::middleware('auth')->group(function () {
         $notifications = \App\Models\PlatformNotification::where(function ($q) {
                 $q->where('user_id', auth()->id())->orWhereNull('user_id');
             })
-            ->whereNull('read_at')
             ->latest()
             ->take(8)
             ->get()
@@ -71,16 +74,19 @@ Route::middleware('auth')->group(function () {
                     'title' => $n->title,
                     'body' => $n->body,
                     'time' => $n->created_at ? $n->created_at->diffForHumans() : 'Just now',
-                    'unread' => true,
+                    'unread' => is_null($n->read_at),
                 ];
             });
-        $unreadCount = $notifications->count();
+        $unreadCount = $notifications->where('unread', true)->count();
         return response()->json([
             'notifications' => $notifications,
             'unreadCount' => $unreadCount,
         ]);
     })->name('notifications.feed');
 
+    // Marks every notification visible to this user as read. Kept from our tree
+    // when sir's web layer was merged in — the mobile apps and the portal bell
+    // both call it, and his copy predates it.
     Route::post('/notifications/clear-all', function () {
         \App\Models\PlatformNotification::where(function ($q) {
                 $q->where('user_id', auth()->id())->orWhereNull('user_id');
@@ -91,25 +97,25 @@ Route::middleware('auth')->group(function () {
     })->name('notifications.clear-all');
 
     Route::post('/notifications/mark-all-read', function () {
-        \App\Models\PlatformNotification::where(function ($q) {
-                $q->where('user_id', auth()->id())->orWhereNull('user_id');
-            })
+        \App\Models\PlatformNotification::where('user_id', auth()->id())
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
         return response()->json(['status' => 'success']);
     })->name('notifications.mark-all-read');
 });
 
-Route::get('/register', fn() => redirect()->route('register.seeker'))->name('register');
+// Bare /register kept from our tree: several links and the apps point at it.
+Route::get('/register', fn () => redirect()->route('register.seeker'))->name('register');
 Route::get('/register/job-seeker', [AuthController::class, 'showCandidateRegister'])->name('register.seeker');
 Route::post('/register/job-seeker', [AuthController::class, 'registerCandidate'])->name('register.seeker.store');
 Route::get('/register/employer', [AuthController::class, 'showEmployerRegister'])->name('register.employer');
 Route::post('/register/employer', [AuthController::class, 'registerEmployer'])->name('register.employer.store');
 
 Route::middleware('auth')->group(function (): void {
-	Route::get('/admin', DashboardController::class)->name('admin.dashboard');
 	Route::get('/admin/site-settings', [SiteSettingsController::class,'edit'])->name('admin.site-settings.edit');
-	Route::put('/admin/site-settings', [SiteSettingsController::class,'update'])->name('admin.site-settings.update');
+	Route::put('/admin/site-settings', [SiteSettingsController::class,'update'])
+		->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])
+		->name('admin.site-settings.update');
 	Route::get('/admin/command/{section}/{view?}', [CommandCenterController::class, 'show'])->name('admin.command.show');
 	Route::get('/admin/companies', [CompanyController::class, 'index'])->name('admin.companies.index');
 	Route::get('/admin/companies/{company}/edit', [CompanyController::class, 'edit'])->name('admin.companies.edit');
@@ -223,7 +229,9 @@ Route::middleware('auth')->group(function (): void {
 	Route::post('/employer/portal/{section}', [EmployerPortalController::class, 'store'])->name('employer.portal.store');
 	Route::put('/employer/portal-records/{record}', [EmployerPortalController::class, 'update'])->name('employer.portal.update');
 	Route::delete('/employer/portal-records/{record}', [EmployerPortalController::class, 'destroy'])->name('employer.portal.destroy');
-	Route::put('/employer/company-profile', [EmployerPortalController::class, 'updateProfile'])->name('employer.company-profile.update');
+	Route::put('/employer/company-profile', [EmployerPortalController::class, 'updateProfile'])
+		->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])
+		->name('employer.company-profile.update');
 	Route::put('/employer/ai-configuration', [EmployerPortalController::class, 'updateAiConfiguration'])->name('employer.ai-configuration.update');
 	Route::post('/employer/ai-configuration/test', [EmployerPortalController::class, 'testAiConfiguration'])->name('employer.ai-configuration.test');
 	Route::delete('/employer/ai-configuration', [EmployerPortalController::class, 'removeAiConfiguration'])->name('employer.ai-configuration.remove');
@@ -231,6 +239,7 @@ Route::middleware('auth')->group(function (): void {
 	Route::get('/employer/jobs/{job}/applicants', [RecruitmentController::class,'show'])->name('employer.jobs.applicants');
 	Route::post('/employer/jobs/{job}/applications/{application}/status', [RecruitmentController::class,'status'])->name('employer.applications.status');
 	Route::post('/employer/jobs/{job}/applications/{application}/interview', [RecruitmentController::class,'interview'])->name('employer.applications.interview');
+	Route::post('/employer/jobs/{job}/applications/{application}/offer', [RecruitmentController::class,'offer'])->name('employer.applications.offer');
 	Route::get('/job-seeker', SeekerDashboardController::class)->name('seeker.dashboard');
 	Route::post('/job-seeker/jobs/{job}/apply', [SeekerDashboardController::class, 'apply'])->name('seeker.jobs.apply');
 	Route::delete('/job-seeker/applications/{application}/withdraw', [SeekerDashboardController::class, 'withdraw'])->name('seeker.applications.withdraw');

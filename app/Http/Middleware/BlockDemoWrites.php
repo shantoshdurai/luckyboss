@@ -31,7 +31,7 @@ class BlockDemoWrites
         if ($user?->is_demo && in_array($request->method(), self::WRITE_METHODS, true)) {
             return response()->json([
                 'status' => 'demo_read_only',
-                'message' => 'This is the Lucky Boss demo account. Create a free account to apply for jobs and edit your profile.',
+                'message' => 'This is the Luckyboss demo account. Create a free account to apply for jobs and edit your profile.',
             ], 403);
         }
 

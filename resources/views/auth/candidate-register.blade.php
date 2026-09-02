@@ -1,4 +1,4 @@
-<x-layouts.app title="Create Job Seeker Account — Lucky Boss Portal">
+<x-layouts.app title="Create Job Seeker Account — Luckyboss Portal">
     <div class="min-h-[calc(100vh-72px)] flex">
         {{-- Left: Brand Side --}}
         <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-navy via-primary-800 to-accent relative overflow-hidden">

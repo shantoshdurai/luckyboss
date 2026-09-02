@@ -1,4 +1,4 @@
-<x-layouts.app title="Lucky Boss Portal | Elite AI-Powered Recruitment Platform">
+<x-layouts.app title="Luckyboss Employment Agency Pte. Ltd | AI-Powered Recruitment Platform">
     {{-- ═══════════════════════════════════════════════════════════
          1. HERO SECTION: Full-Screen 100vh Majestic Command Center
     ═══════════════════════════════════════════════════════════════ --}}
@@ -198,7 +198,7 @@
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
                                 <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-white/20 backdrop-blur-md border border-white/30 text-white">
-                                        {{ number_format($jobCount) }} {{ Str::plural('role', $jobCount) }}
+                                        {{ number_format($jobCount) }} Jobs Available
                                     </span>
                                 </div>
                             </div>
@@ -462,7 +462,7 @@
         <div class="container mx-auto px-6 transition-all duration-700 transform" :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'">
             <div class="text-center max-w-2xl mx-auto mb-14">
                 <span class="text-xs font-bold uppercase tracking-widest text-secondary-600 mb-2 block">Process Workflow</span>
-                <h2 class="text-3xl sm:text-4xl font-heading font-extrabold text-navy mb-3">How Lucky Boss Works</h2>
+                <h2 class="text-3xl sm:text-4xl font-heading font-extrabold text-navy mb-3">How Luckyboss Works</h2>
                 <p class="text-text-secondary text-base">Designed for maximum speed, accuracy, and transparent communication.</p>
             </div>
 

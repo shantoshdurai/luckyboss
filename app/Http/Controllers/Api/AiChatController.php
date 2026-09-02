@@ -33,7 +33,7 @@ class AiChatController extends Controller
             try {
                 $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$geminiModel}:generateContent?key=" . urlencode($geminiKey);
                 
-                $systemInstruction = "You are Lucky AI, the smart recruitment copilot for the Lucky Boss Marketplace (Singapore, Malaysia, India).
+                $systemInstruction = "You are Lucky AI, the smart recruitment copilot for the Luckyboss Marketplace (Singapore, Malaysia, India).
 
 STRICT RESPONSE GUIDELINES (Goldilocks Rule - Not too short, not too long):
 1. NO FILLER FLUFF: Skip generic pleasantries (e.g. \"That is an excellent question...\"). Jump straight into the answer.
@@ -88,7 +88,7 @@ STRICT RESPONSE GUIDELINES (Goldilocks Rule - Not too short, not too long):
     private function runLocalChatScript(string $message): array
     {
         $q = strtolower($message);
-        $reply = "Hello! I am Lucky AI, your recruitment copilot on Lucky Boss.\n\nHere is how I can assist you today:\n• 🔍 **Find Verified Jobs:** Browse active openings across Singapore, Malaysia, and India.\n• 📊 **Salary Insights:** Check competitive compensation benchmarks.\n• 📄 **Resume Match Scoring:** Get instant feedback on your profile fit.\n• 🏢 **Employer Hiring:** Post vacancies and access 50,000+ candidates.";
+        $reply = "Hello! I am Lucky AI, your recruitment copilot on Luckyboss.\n\nHere is how I can assist you today:\n• 🔍 **Find Verified Jobs:** Browse active openings across Singapore, Malaysia, and India.\n• 📊 **Salary Insights:** Check competitive compensation benchmarks.\n• 📄 **Resume Match Scoring:** Get instant feedback on your profile fit.\n• 🏢 **Employer Hiring:** Post vacancies and access 50,000+ candidates.";
         $actions = [
             ['label' => 'Explore Jobs', 'url' => route('jobs.index')],
             ['label' => 'Post Vacancy', 'url' => route('register.employer')]
@@ -122,12 +122,12 @@ STRICT RESPONSE GUIDELINES (Goldilocks Rule - Not too short, not too long):
             $reply = "We have verified openings for **Site Supervisors** and **Civil Engineers** in Singapore and Malaysia (SGD 4,200 - 5,800/month) with immediate employer shortlisting.";
             $actions = [['label' => 'Explore Construction Roles', 'url' => route('jobs.index', ['keyword' => 'Construction'])]];
         } elseif (str_contains($q, 'resume') || str_contains($q, 'score') || str_contains($q, 'match')) {
-            $reply = "To achieve a **90%+ match score** on Lucky Boss:\n\n• List 5+ specific technical and operational skills.\n• Detail measurable outcomes from previous employment.\n• Keep your location and salary expectations accurate.\n• Upload a clean PDF version of your resume.";
+            $reply = "To achieve a **90%+ match score** on Luckyboss:\n\n• List 5+ specific technical and operational skills.\n• Detail measurable outcomes from previous employment.\n• Keep your location and salary expectations accurate.\n• Upload a clean PDF version of your resume.";
             $actions = [
                 ['label' => 'Update Profile & Resume', 'url' => route('seeker.profile.edit')]
             ];
         } elseif (str_contains($q, 'salary') || str_contains($q, 'paying') || str_contains($q, 'pay')) {
-            $reply = "Top published roles on Lucky Boss range from **SGD 3,500 to SGD 6,500/month** across Engineering, Technology, Logistics, and Healthcare sectors.";
+            $reply = "Top published roles on Luckyboss range from **SGD 3,500 to SGD 6,500/month** across Engineering, Technology, Logistics, and Healthcare sectors.";
             $actions = [['label' => 'Browse High-Paying Jobs', 'url' => route('jobs.index')]];
         }
 

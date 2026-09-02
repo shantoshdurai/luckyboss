@@ -38,7 +38,13 @@
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                         {{-- Candidate Info --}}
                         <div class="flex items-start gap-4 min-w-0">
-                            <x-ui.avatar :name="$candidate->name" size="lg" />
+                            @if($profile?->profile_photo_path)
+                                <img src="{{ asset($profile->profile_photo_path) }}" alt="{{ $candidate->name }} profile picture" class="w-20 h-20 shrink-0 rounded-[10px] object-cover border-2 border-blue-200" loading="lazy">
+                            @else
+                                <div class="w-20 h-20 shrink-0 rounded-[10px] bg-blue-100 text-accent flex items-center justify-center text-xl font-bold border-2 border-blue-200">
+                                    {{ strtoupper(substr($candidate->name ?? 'C', 0, 2)) }}
+                                </div>
+                            @endif
                             <div class="min-w-0">
                                 <div class="flex items-center gap-2">
                                     <h3 class="text-base font-bold text-navy truncate">{{ $candidate->name }}</h3>

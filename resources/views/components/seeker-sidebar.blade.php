@@ -1,4 +1,5 @@
 @props(['title' => 'Job Seeker Portal'])
+<?php $branding = app(\App\Services\SiteSettingsService::class)->branding(); ?>
 
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-slate-50">
@@ -6,13 +7,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title }} | Lucky Boss Candidate</title>
-    @if(file_exists(public_path('build/manifest.json')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @else
-        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-        <script defer src="{{ asset('js/app.js') }}"></script>
-    @endif
+    <title>{{ $title }} | Luckyboss Employment Agency Candidate Portal</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="h-full antialiased font-sans text-text-primary" x-data="{ sidebarOpen: true, mobileSidebarOpen: false }">
     <div class="flex min-h-screen">
@@ -25,8 +21,8 @@
             <div class="flex items-center justify-between h-20 px-5 border-b border-border shrink-0 bg-white">
                 <a href="{{ route('seeker.dashboard') }}" class="flex items-center gap-2.5">
                     <img 
-                        src="{{ asset('images/lucky-boss-logo-transparent.png') }}" 
-                        alt="Lucky Boss" 
+                        src="{{ asset($branding['logo_url']) }}"
+                        alt="Luckyboss" 
                         class="h-12 sm:h-13 w-auto max-h-14 object-contain"
                     >
                 </a>
@@ -35,9 +31,13 @@
             {{-- Verified Candidate Card --}}
             <div x-show="sidebarOpen" class="p-4 border-b border-border bg-slate-50/70">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-secondary-100 text-secondary-700 flex items-center justify-center font-bold shrink-0">
-                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    </div>
+                        @if(auth()->user()->candidateProfile?->profile_photo_path)
+                            <img src="{{ asset(auth()->user()->candidateProfile->profile_photo_path) }}" alt="{{ auth()->user()->name }} profile picture" class="w-10 h-10 rounded-xl object-cover border border-emerald-200 shrink-0" loading="lazy">
+                        @else
+                            <div class="w-10 h-10 rounded-xl bg-secondary-100 text-secondary-700 flex items-center justify-center font-bold shrink-0">
+                                <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            </div>
+                        @endif
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-1.5">
                             <p class="text-sm font-bold text-navy truncate">{{ auth()->user()->name ?? 'Candidate' }}</p>
@@ -50,7 +50,7 @@
 
             {{-- Navigation --}}
             <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1 scrollbar-thin">
-                @php
+                <?php
                     $currentTab = request('tab', 'dashboard');
                     $nav = [
                         ['label' => 'Dashboard', 'url' => route('seeker.dashboard'), 'active' => request()->routeIs('seeker.dashboard') && empty(request('tab')), 'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'],
@@ -60,7 +60,7 @@
                         ['label' => 'Candidate Profile', 'url' => route('seeker.profile.edit'), 'active' => request()->routeIs('seeker.profile.*'), 'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'],
                         ['label' => 'Find Jobs', 'url' => route('jobs.index'), 'active' => false, 'icon' => 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'],
                     ];
-                @endphp
+                ?>
 
                 @foreach($nav as $item)
                     <a href="{{ $item['url'] }}"

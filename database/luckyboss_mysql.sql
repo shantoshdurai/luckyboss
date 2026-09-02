@@ -50,7 +50,7 @@ INSERT INTO `admin_records` (`id`, `module`, `name`, `slug`, `description`, `pay
 (4, 'home-sections', 'Featured Jobs', 'featured-jobs', 'Website and app home section', '[]', 1, '2026-08-20 05:20:18', '2026-08-21 00:39:24'),
 (5, 'location-masters', 'Singapore', 'singapore', 'Country master', '[]', 1, '2026-08-20 05:20:18', '2026-08-21 00:39:24'),
 (6, 'general-settings', 'Portal Branding', 'portal-branding', 'Logo and primary color settings', '[]', 1, '2026-08-20 05:20:18', '2026-08-21 00:39:24'),
-(7, 'branding', 'Website Branding', 'website-branding', 'Public website and portal brand settings', '{\"logo_url\":\"http:\\/\\/127.0.0.1:8000\\/uploads\\/branding\\/lucky-boss-20260820115507.png\",\"favicon_url\":\"http:\\/\\/127.0.0.1:8000\\/uploads\\/branding\\/favicon-20260821075904.png\",\"site_name\":\"Lucky Boss Portal\",\"seo_title\":\"Lucky Boss Portal | AI-Powered Recruitment\",\"seo_description\":\"Find jobs, build your career, and manage recruitment with Lucky Boss Portal.\",\"primary_color\":\"#031f49\",\"secondary_color\":\"#18a66a\"}', 1, '2026-08-20 06:25:07', '2026-08-21 02:29:04'),
+(7, 'branding', 'Website Branding', 'website-branding', 'Public website and portal brand settings', '{\"logo_url\":\"http:\\/\\/127.0.0.1:8000\\/uploads\\/branding\\/lucky-boss-20260820115507.png\",\"favicon_url\":\"http:\\/\\/127.0.0.1:8000\\/uploads\\/branding\\/favicon-20260821075904.png\",\"site_name\":\"Luckyboss Portal\",\"seo_title\":\"Luckyboss Portal | AI-Powered Recruitment\",\"seo_description\":\"Find jobs, build your career, and manage recruitment with Luckyboss Portal.\",\"primary_color\":\"#031f49\",\"secondary_color\":\"#18a66a\"}', 1, '2026-08-20 06:25:07', '2026-08-21 02:29:04'),
 (8, 'contact-information', 'Official Contact', 'official-contact', 'Official public office and contact details', '{\"office_address\":\"Singapore\",\"official_email\":\"hello@luckyboss.test\",\"official_phone\":null,\"facebook_url\":\"https:\\/\\/www.facebook.com\\/\",\"instagram_url\":\"https:\\/\\/www.instagram.com\\/\",\"linkedin_url\":\"https:\\/\\/www.linkedin.com\\/\",\"youtube_url\":\"https:\\/\\/www.youtube.com\\/\",\"whatsapp_url\":\"https:\\/\\/wa.me\\/\"}', 1, '2026-08-20 06:25:07', '2026-08-20 08:56:31');
 
 -- --------------------------------------------------------
@@ -156,7 +156,7 @@ CREATE TABLE `blogs` (
   `category` varchar(255) DEFAULT NULL,
   `short_description` text NOT NULL,
   `content` longtext NOT NULL,
-  `author` varchar(255) NOT NULL DEFAULT 'Lucky Boss Team',
+  `author` varchar(255) NOT NULL DEFAULT 'Luckyboss Team',
   `published_at` timestamp NULL DEFAULT NULL,
   `is_published` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -168,14 +168,14 @@ CREATE TABLE `blogs` (
 --
 
 INSERT INTO `blogs` (`id`, `title`, `image_path`, `slug`, `category`, `short_description`, `content`, `author`, `published_at`, `is_published`, `created_at`, `updated_at`) VALUES
-(1, 'How to Prepare for a Warehouse Supervisor Interview', 'images/lucky-boss-logo.png', 'how-to-prepare-for-a-warehouse-supervisor-interview', 'Interview Tips', 'Practical preparation tips for leading warehouse teams and demonstrating operational confidence.', 'A strong warehouse supervisor interview begins with specific examples. Prepare to explain how you improve safety, plan shifts, manage stock accuracy, and support your team through busy periods.', 'Lucky Boss Team', '2026-08-20 00:39:24', 1, '2026-08-20 04:57:54', '2026-08-21 00:39:24'),
-(2, 'Creating a Resume That Gets Noticed', 'images/lucky-boss-logo.png', 'creating-a-resume-that-gets-noticed', 'Resume Tips', 'A clear, focused resume helps employers quickly understand your experience and potential.', 'Lead with your most relevant experience, use measurable outcomes where possible, and tailor your skills to the role you want. Keep your contact details current and make your availability clear.', 'Lucky Boss Team', '2026-08-16 00:39:24', 1, '2026-08-20 04:57:54', '2026-08-21 00:39:24'),
-(3, 'Building a More Effective Hiring Pipeline', 'images/lucky-boss-logo.png', 'building-a-more-effective-hiring-pipeline', 'Employer Guides', 'Simple habits that help employers turn applications into confident hiring decisions.', 'Define the outcome for every hiring stage, respond quickly to suitable applicants, and keep candidates informed. A consistent process improves both hiring quality and employer reputation.', 'Lucky Boss Team', '2026-08-11 00:39:24', 1, '2026-08-20 04:57:54', '2026-08-21 00:39:24'),
-(4, 'How to Write Better Job Descriptions', 'images/lucky-boss-logo.png', 'how-to-write-better-job-descriptions', 'Employer Guides', 'Clear job descriptions attract better matched applicants.', 'Describe the outcome of the role, the essential skills, the working arrangement, and the next step. Avoid long lists of vague requirements.', 'Lucky Boss Team', '2026-08-07 00:39:24', 1, '2026-08-21 00:17:03', '2026-08-21 00:39:24'),
-(5, 'Preparing for Your First Interview', 'images/lucky-boss-logo.png', 'preparing-for-your-first-interview', 'Interview Tips', 'A practical checklist for confident job interviews.', 'Review the role, prepare concise examples from your experience, test your meeting link, and prepare thoughtful questions for the interviewer.', 'Lucky Boss Team', '2026-08-17 00:39:24', 1, '2026-08-21 00:17:03', '2026-08-21 00:39:24'),
-(6, 'Skills That Stand Out in Logistics', 'images/lucky-boss-logo.png', 'skills-that-stand-out-in-logistics', 'Industry News', 'The capabilities modern logistics teams value most.', 'Safety awareness, inventory accuracy, communication, and comfort with operational systems are increasingly valuable across logistics roles.', 'Lucky Boss Team', '2026-08-13 00:39:24', 1, '2026-08-21 00:17:03', '2026-08-21 00:39:24'),
-(7, 'Making Your Profile Searchable', 'images/lucky-boss-logo.png', 'making-your-profile-searchable', 'Resume Tips', 'Small profile improvements that help employers find you.', 'Use specific job titles, list your strongest skills, keep your location current, and explain measurable achievements in your work history.', 'Lucky Boss Team', '2026-08-14 00:39:24', 1, '2026-08-21 00:17:03', '2026-08-21 00:39:24'),
-(8, 'Interview Feedback That Improves Hiring', 'images/lucky-boss-logo.png', 'interview-feedback-that-improves-hiring', 'Employer Guides', 'Turn interview notes into consistent hiring decisions.', 'Record evidence against the role requirements, separate facts from impressions, and capture a clear recommendation while the conversation is fresh.', 'Lucky Boss Team', '2026-08-17 00:39:24', 1, '2026-08-21 00:17:03', '2026-08-21 00:39:24');
+(1, 'How to Prepare for a Warehouse Supervisor Interview', 'images/lucky-boss-logo.png', 'how-to-prepare-for-a-warehouse-supervisor-interview', 'Interview Tips', 'Practical preparation tips for leading warehouse teams and demonstrating operational confidence.', 'A strong warehouse supervisor interview begins with specific examples. Prepare to explain how you improve safety, plan shifts, manage stock accuracy, and support your team through busy periods.', 'Luckyboss Team', '2026-08-20 00:39:24', 1, '2026-08-20 04:57:54', '2026-08-21 00:39:24'),
+(2, 'Creating a Resume That Gets Noticed', 'images/lucky-boss-logo.png', 'creating-a-resume-that-gets-noticed', 'Resume Tips', 'A clear, focused resume helps employers quickly understand your experience and potential.', 'Lead with your most relevant experience, use measurable outcomes where possible, and tailor your skills to the role you want. Keep your contact details current and make your availability clear.', 'Luckyboss Team', '2026-08-16 00:39:24', 1, '2026-08-20 04:57:54', '2026-08-21 00:39:24'),
+(3, 'Building a More Effective Hiring Pipeline', 'images/lucky-boss-logo.png', 'building-a-more-effective-hiring-pipeline', 'Employer Guides', 'Simple habits that help employers turn applications into confident hiring decisions.', 'Define the outcome for every hiring stage, respond quickly to suitable applicants, and keep candidates informed. A consistent process improves both hiring quality and employer reputation.', 'Luckyboss Team', '2026-08-11 00:39:24', 1, '2026-08-20 04:57:54', '2026-08-21 00:39:24'),
+(4, 'How to Write Better Job Descriptions', 'images/lucky-boss-logo.png', 'how-to-write-better-job-descriptions', 'Employer Guides', 'Clear job descriptions attract better matched applicants.', 'Describe the outcome of the role, the essential skills, the working arrangement, and the next step. Avoid long lists of vague requirements.', 'Luckyboss Team', '2026-08-07 00:39:24', 1, '2026-08-21 00:17:03', '2026-08-21 00:39:24'),
+(5, 'Preparing for Your First Interview', 'images/lucky-boss-logo.png', 'preparing-for-your-first-interview', 'Interview Tips', 'A practical checklist for confident job interviews.', 'Review the role, prepare concise examples from your experience, test your meeting link, and prepare thoughtful questions for the interviewer.', 'Luckyboss Team', '2026-08-17 00:39:24', 1, '2026-08-21 00:17:03', '2026-08-21 00:39:24'),
+(6, 'Skills That Stand Out in Logistics', 'images/lucky-boss-logo.png', 'skills-that-stand-out-in-logistics', 'Industry News', 'The capabilities modern logistics teams value most.', 'Safety awareness, inventory accuracy, communication, and comfort with operational systems are increasingly valuable across logistics roles.', 'Luckyboss Team', '2026-08-13 00:39:24', 1, '2026-08-21 00:17:03', '2026-08-21 00:39:24'),
+(7, 'Making Your Profile Searchable', 'images/lucky-boss-logo.png', 'making-your-profile-searchable', 'Resume Tips', 'Small profile improvements that help employers find you.', 'Use specific job titles, list your strongest skills, keep your location current, and explain measurable achievements in your work history.', 'Luckyboss Team', '2026-08-14 00:39:24', 1, '2026-08-21 00:17:03', '2026-08-21 00:39:24'),
+(8, 'Interview Feedback That Improves Hiring', 'images/lucky-boss-logo.png', 'interview-feedback-that-improves-hiring', 'Employer Guides', 'Turn interview notes into consistent hiring decisions.', 'Record evidence against the role requirements, separate facts from impressions, and capture a clear recommendation while the conversation is fresh.', 'Luckyboss Team', '2026-08-17 00:39:24', 1, '2026-08-21 00:17:03', '2026-08-21 00:39:24');
 
 -- --------------------------------------------------------
 
@@ -406,7 +406,7 @@ CREATE TABLE `companies` (
 --
 
 INSERT INTO `companies` (`id`, `company_type_id`, `company_grade_id`, `name`, `logo_path`, `registration_number`, `industry`, `email`, `phone`, `website`, `country_code`, `state`, `city`, `address`, `status`, `verified_at`, `created_at`, `updated_at`) VALUES
-(1, 1, 4, 'Lucky Boss Demo Recruitment', NULL, NULL, 'Recruitment', 'hello@luckyboss.test', NULL, NULL, 'SG', NULL, NULL, NULL, 'verified', NULL, '2026-08-20 04:32:52', '2026-08-20 04:32:52'),
+(1, 1, 4, 'Luckyboss Demo Recruitment', NULL, NULL, 'Recruitment', 'hello@luckyboss.test', NULL, NULL, 'SG', NULL, NULL, NULL, 'verified', NULL, '2026-08-20 04:32:52', '2026-08-20 04:32:52'),
 (2, 2, NULL, 'Maac Technologies', 'uploads/companies/company-20260821060714-yQxpxH.webp', '9944995493', NULL, 'thiru.maac@gmail.com', '9944995493', NULL, 'SG', NULL, NULL, NULL, 'verified', '2026-08-20 11:01:40', '2026-08-20 10:55:16', '2026-08-21 00:37:14');
 
 -- --------------------------------------------------------
@@ -1207,7 +1207,7 @@ CREATE TABLE `platform_notifications` (
 --
 
 INSERT INTO `platform_notifications` (`id`, `user_id`, `type`, `title`, `body`, `data`, `sound`, `read_at`, `created_at`, `updated_at`) VALUES
-(1, 3, 'application_update', 'Your application was shortlisted', 'Lucky Boss Demo Recruitment shortlisted you for Warehouse Supervisor.', NULL, 'application_update', NULL, '2026-08-20 05:03:52', '2026-08-20 05:03:52');
+(1, 3, 'application_update', 'Your application was shortlisted', 'Luckyboss Demo Recruitment shortlisted you for Warehouse Supervisor.', NULL, 'application_update', NULL, '2026-08-20 05:03:52', '2026-08-20 05:03:52');
 
 -- --------------------------------------------------------
 
@@ -1474,10 +1474,10 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `phone`, `country_code`, `email_verified_at`, `password`, `is_active`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'Lucky Boss Admin', 'admincrm@luckyboss.org', NULL, 'SG', NULL, '$2y$12$qyKHUWPLvxohxvsbNTOK4eLkUjBeF8ec8SIfrL9.LsiEy5HH.hRy.', 1, NULL, '2026-08-20 04:32:52', '2026-08-20 06:56:33'),
+(1, 'Luckyboss Admin', 'admincrm@luckyboss.org', NULL, 'SG', NULL, '$2y$12$qyKHUWPLvxohxvsbNTOK4eLkUjBeF8ec8SIfrL9.LsiEy5HH.hRy.', 1, NULL, '2026-08-20 04:32:52', '2026-08-20 06:56:33'),
 (2, 'Arun Kumar', 'employer@luckyboss.test', '+6591234567', 'SG', NULL, '$2y$12$kCMndc3MMrlfeE.6RyJquOB40MgkaWpPkAVbMUYN9FRL.1x5lyHq6', 1, NULL, '2026-08-20 04:32:52', '2026-08-20 04:32:52'),
 (3, 'Maya Tan', 'candidate@luckyboss.test', '+6587654321', 'SG', NULL, '$2y$12$oqkICc8aYiRwBSRnC54g/ecvD738HYPRc4w/Na88L2ui4YpRZNuXi', 1, NULL, '2026-08-20 04:32:53', '2026-08-20 04:32:53'),
-(4, 'Lucky Boss Admin', 'admin@luckyboss.test', NULL, 'SG', NULL, '$2y$12$edsAbLg4GgdVPMPyNDZ1VuGvuyC/m7dxF7WiOCLyh2GU2ULnUqIb2', 1, NULL, '2026-08-20 09:09:57', '2026-08-20 09:09:57'),
+(4, 'Luckyboss Admin', 'admin@luckyboss.test', NULL, 'SG', NULL, '$2y$12$edsAbLg4GgdVPMPyNDZ1VuGvuyC/m7dxF7WiOCLyh2GU2ULnUqIb2', 1, NULL, '2026-08-20 09:09:57', '2026-08-20 09:09:57'),
 (5, 'thiru', 'thiru9944@gmail.com', '7373727190', 'SG', NULL, '$2y$12$JePcvY9YQva4ViPu9kosTur7EkOnJ746To9wgEk0l4c3OcXTN5EwO', 1, NULL, '2026-08-20 09:50:04', '2026-08-20 09:50:04'),
 (6, 'maac', 'thiru.maac@gmail.com', '9944995493', 'SG', NULL, '$2y$12$k7IacJUS6kR7ZmNNpQbt.enBQELKWf43yasbZYsSPe.2JozmrRciu', 1, NULL, '2026-08-20 10:55:16', '2026-08-20 10:55:16');
 

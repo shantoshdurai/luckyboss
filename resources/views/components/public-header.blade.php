@@ -1,3 +1,4 @@
+<?php $branding = app(\App\Services\SiteSettingsService::class)->branding(); ?>
 <header 
     x-data="{ 
         open: false,
@@ -10,14 +11,15 @@
     class="sticky top-0 z-50 transition-all duration-300 text-slate-800"
 >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-22 lg:h-24 gap-4">
-            {{-- Brand Logo (Enlarged & Crystal Clear on White Background) --}}
-            <a href="{{ route('home') }}" class="flex items-center py-2 flex-shrink-0 group">
-                <div class="relative py-1 flex items-center">
+        <div class="flex items-center justify-between min-h-16 sm:min-h-20 lg:min-h-24 gap-3 sm:gap-4">
+            {{-- Brand Logo (Prominent & Professional Display) --}}
+            <a href="{{ route('home') }}" class="flex items-center py-2 flex-shrink-0 group focus:outline-none">
+                <div class="relative py-1 flex items-center bg-gradient-to-r from-slate-50 to-white rounded-lg px-1.5 sm:px-2">
                     <img 
-                        src="{{ asset('images/lucky-boss-logo-transparent.png') }}" 
-                        alt="Lucky Boss" 
-                        class="h-15 sm:h-17 lg:h-18 w-auto max-h-20 object-contain transition-transform duration-200 group-hover:scale-103"
+                        src="{{ asset($branding['logo_url']) }}" 
+                        alt="Luckyboss Employment Agency Pte. Ltd" 
+                        class="h-12 sm:h-16 lg:h-20 w-auto max-w-[210px] sm:max-w-[260px] lg:max-w-[300px] object-contain transition-all duration-300 group-hover:scale-105"
+                        loading="eager"
                     >
                 </div>
             </a>
@@ -63,8 +65,8 @@
 
             {{-- Right Actions: Sign In / Register / Dashboard --}}
             <div class="hidden sm:flex items-center gap-3 shrink-0">
-                @auth
-                    @php $user = auth()->user(); @endphp
+                <?php if (auth()->check()) { $user = auth()->user(); ?>
+                    <span class="hidden lg:inline text-xs font-semibold text-slate-600 max-w-32 truncate" title="{{ $user->name }}">Hi, {{ $user->name }}</span>
                     <a href="{{ $user->hasRole('super-admin') ? route('admin.dashboard') : ($user->hasRole('employer') ? route('employer.dashboard') : route('seeker.dashboard')) }}"
                        class="btn btn-primary btn-sm shadow-md flex items-center gap-1.5 text-xs font-bold transition-all hover:scale-102">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
@@ -77,7 +79,7 @@
                             Sign Out
                         </button>
                     </form>
-                @else
+                <?php } else { ?>
                     <a href="{{ route('login') }}" 
                        class="text-xs font-bold px-3 py-1.5 text-navy hover:text-secondary-600 transition-colors">
                         Sign In
@@ -103,13 +105,13 @@
                             </a>
                         </div>
                     </div>
-                @endauth
+                <?php } ?>
             </div>
 
             {{-- Mobile / Tablet Hamburger --}}
             <button 
                 @click="open = !open" 
-                class="xl:hidden p-2 rounded-xl transition-colors border border-slate-200 text-slate-800 hover:bg-slate-100 cursor-pointer" 
+                class="xl:hidden flex h-10 w-10 shrink-0 items-center justify-center p-2 rounded-xl transition-colors border border-slate-200 text-slate-800 hover:bg-slate-100 cursor-pointer" 
                 aria-label="Menu"
             >
                 <svg x-show="!open" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
@@ -137,19 +139,19 @@
             <a href="{{ route('blogs.index') }}" class="block px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100 rounded-xl">Blog</a>
             
             <div class="border-t border-slate-200 pt-3 mt-3 px-4 flex flex-col gap-2">
-                @auth
-                    @php $user = auth()->user(); @endphp
+                <?php if (auth()->check()) { $user = auth()->user(); ?>
+                    <p class="text-sm font-semibold text-slate-600">Hi, {{ $user->name }}</p>
                     <a href="{{ $user->hasRole('super-admin') ? route('admin.dashboard') : ($user->hasRole('employer') ? route('employer.dashboard') : route('seeker.dashboard')) }}" class="btn btn-primary btn-sm w-full text-center font-bold">
                         Dashboard
                     </a>
-                @else
+                <?php } else { ?>
                     <a href="{{ route('login') }}" class="btn btn-outline btn-sm w-full text-center border-slate-300 text-slate-800 font-bold">
                         Sign In
                     </a>
                     <a href="{{ route('register.seeker') }}" class="btn btn-primary btn-sm w-full text-center font-bold">
                         Create Candidate Profile
                     </a>
-                @endauth
+                <?php } ?>
             </div>
         </div>
     </div>

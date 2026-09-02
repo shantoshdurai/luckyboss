@@ -51,9 +51,13 @@
                                 <tr class="hover:bg-slate-50/60 transition-colors">
                                     <td class="p-4">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-8 h-8 rounded-full bg-secondary-100 text-secondary-700 font-bold flex items-center justify-center text-xs">
-                                                {{ substr($app->candidate->name ?? 'C', 0, 2) }}
-                                            </div>
+                                            @if($app->candidate?->candidateProfile?->profile_photo_path)
+                                                <img src="{{ asset($app->candidate->candidateProfile->profile_photo_path) }}" alt="{{ $app->candidate->name }} profile picture" class="w-20 h-20 rounded-[10px] object-cover border-2 border-blue-200">
+                                            @else
+                                                <div class="w-20 h-20 rounded-[10px] bg-secondary-100 text-secondary-700 font-bold flex items-center justify-center text-xl border-2 border-secondary-200">
+                                                    {{ strtoupper(substr($app->candidate->name ?? 'C', 0, 2)) }}
+                                                </div>
+                                            @endif
                                             <div>
                                                 <p class="font-bold text-navy">{{ $app->candidate->name }}</p>
                                                 <p class="text-[11px] text-text-muted">{{ $app->candidate->email }}</p>
@@ -203,7 +207,7 @@
         {{-- 4. CANDIDATE TALENT SEARCH --}}
         @if($section === 'candidate-search')
             <div class="bg-white rounded-2xl border border-border p-6 shadow-xs space-y-4">
-                <h3 class="text-base font-bold text-navy">Search Lucky Boss Talent Pool</h3>
+                <h3 class="text-base font-bold text-navy">Search Luckyboss Talent Pool</h3>
                 <form method="GET" action="{{ route('employer.portal', 'candidate-search') }}" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <input type="text" name="keyword" value="{{ request('keyword') }}" placeholder="Search candidate skills or title..." class="input w-full text-xs">
                     <input type="text" name="location" value="{{ request('location') }}" placeholder="Location (e.g. Singapore)..." class="input w-full text-xs">
@@ -412,8 +416,8 @@
             @php($ai = $aiConfiguration?->payload ?? [])
             <div class="bg-white rounded-2xl border border-border p-6 sm:p-8 shadow-xs space-y-6">
                 <div class="border-b border-border pb-4">
-                    <h3 class="text-base font-bold text-navy">Corporate AI Recruitment Engine</h3>
-                    <p class="text-xs text-text-muted mt-0.5">Configure Bring-Your-Own-AI (BYOAI) API keys or use default Lucky Boss platform intelligence.</p>
+                    <h3 class="text-base font-bold text-navy">AI Configuration</h3>
+                    <p class="text-xs text-text-muted mt-0.5">Configure Bring-Your-Own-AI (BYOAI) API keys or use default Luckyboss platform intelligence.</p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
@@ -441,7 +445,7 @@
                             <label class="block text-xs font-bold text-navy mb-1.5">AI Routing Strategy</label>
                             <select name="mode" class="input w-full text-xs">
                                 <option value="automatic" @selected(($ai['mode'] ?? 'automatic') === 'automatic')>Automatic (Recommended)</option>
-                                <option value="lucky_boss_first" @selected(($ai['mode'] ?? '') === 'lucky_boss_first')>Lucky Boss AI First</option>
+                                <option value="lucky_boss_first" @selected(($ai['mode'] ?? '') === 'lucky_boss_first')>Luckyboss AI First</option>
                                 <option value="company_first" @selected(($ai['mode'] ?? '') === 'company_first')>Company AI First</option>
                             </select>
                         </div>
@@ -470,6 +474,10 @@
                     <h3 class="text-base font-bold text-navy">Corporate Profile & Branding</h3>
                     <p class="text-xs text-text-muted mt-0.5">Update public company profile details visible to job seekers.</p>
                 </div>
+
+                @if($company->logo_path)
+                    <img src="{{ asset($company->logo_path) }}" alt="{{ $company->name }} logo" class="h-16 w-auto object-contain">
+                @endif
 
                 <form method="POST" enctype="multipart/form-data" action="{{ route('employer.company-profile.update') }}" class="space-y-4">
                     @csrf
@@ -505,6 +513,12 @@
                                 @endforeach
                             </select>
                         </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-navy mb-1.5">Company Profile Picture / Logo</label>
+                        <input type="file" name="logo" accept="image/*" class="input w-full text-xs">
+                        <p class="text-[11px] text-text-muted mt-1">Upload a square company image to display in the employer portal.</p>
                     </div>
 
                     <div class="pt-3">

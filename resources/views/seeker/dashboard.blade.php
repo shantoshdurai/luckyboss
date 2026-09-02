@@ -53,7 +53,12 @@
                                 <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
                                     Stage: {{ $application->status }}
                                 </span>
-                                @if(!in_array($application->status, ['Hired', 'Rejected', 'Withdrawn']))
+                                @if($application->status === 'Withdrawn')
+                                    <form method="POST" action="{{ route('seeker.jobs.apply', $application->job) }}" class="inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-primary btn-sm text-xs font-bold">Apply Again</button>
+                                    </form>
+                                @elseif(!in_array($application->status, ['Hired', 'Rejected']))
                                     <div x-data="{ confirming: false }" class="flex items-center">
                                         <button x-show="!confirming" @click="confirming = true" type="button" class="btn btn-outline btn-sm text-xs text-rose-600 hover:bg-rose-50 border-rose-200 cursor-pointer">
                                             Withdraw

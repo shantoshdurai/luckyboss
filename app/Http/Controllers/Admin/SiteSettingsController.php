@@ -25,7 +25,7 @@ class SiteSettingsController extends Controller
             'mail_password' => config('mail.mailers.smtp.password', 'onzswvfwffzyqptj'),
             'mail_encryption' => config('mail.mailers.smtp.encryption', 'tls'),
             'mail_from_address' => config('mail.from.address', 'luckybossea@gmail.com'),
-            'mail_from_name' => config('mail.from.name', 'Lucky Boss'),
+            'mail_from_name' => config('mail.from.name', 'Luckyboss'),
         ];
         return view('admin.site-settings.edit', [
             'branding' => $settings->branding(), 
@@ -50,9 +50,12 @@ class SiteSettingsController extends Controller
             'official_phone' => ['nullable', 'string', 'max:50'], 
             'facebook_url' => ['nullable', 'url'], 
             'instagram_url' => ['nullable', 'url'], 
+            'tiktok_url' => ['nullable', 'url'],
             'linkedin_url' => ['nullable', 'url'], 
             'youtube_url' => ['nullable', 'url'], 
             'whatsapp_url' => ['nullable', 'url'],
+            'viber_url' => ['nullable', 'url'],
+            'telegram_url' => ['nullable', 'url'],
             'mail_mailer' => ['nullable', 'string'],
             'mail_host' => ['nullable', 'string'],
             'mail_port' => ['nullable', 'numeric'],
@@ -64,10 +67,10 @@ class SiteSettingsController extends Controller
         ]);
         $current = app(SiteSettingsService::class)->branding();
         $branding = ['logo_url' => $current['logo_url'], 'favicon_url' => $current['favicon_url'] ?? $current['logo_url'], 'site_name' => $data['site_name'], 'seo_title' => $data['seo_title'], 'seo_description' => $data['seo_description'], 'primary_color' => $data['primary_color'], 'secondary_color' => $data['secondary_color']];
-        if ($request->hasFile('logo')) { $file = $request->file('logo'); $directory = public_path('uploads/branding'); if (! is_dir($directory)) mkdir($directory, 0755, true); $name = 'lucky-boss-'.now()->format('YmdHis').'.'.$file->extension(); $file->move($directory, $name); $branding['logo_url'] = asset('uploads/branding/'.$name); }
-        if ($request->hasFile('favicon')) { $file = $request->file('favicon'); $directory = public_path('uploads/branding'); if (! is_dir($directory)) mkdir($directory, 0755, true); $name = 'favicon-'.now()->format('YmdHis').'.'.$file->extension(); $file->move($directory, $name); $branding['favicon_url'] = asset('uploads/branding/'.$name); }
+        if ($request->hasFile('logo')) { $file = $request->file('logo'); $directory = public_path('uploads/branding'); if (! is_dir($directory)) mkdir($directory, 0755, true); $name = 'lucky-boss-'.now()->format('YmdHis').'.'.$file->extension(); $file->move($directory, $name); $branding['logo_url'] = 'uploads/branding/'.$name; }
+        if ($request->hasFile('favicon')) { $file = $request->file('favicon'); $directory = public_path('uploads/branding'); if (! is_dir($directory)) mkdir($directory, 0755, true); $name = 'favicon-'.now()->format('YmdHis').'.'.$file->extension(); $file->move($directory, $name); $branding['favicon_url'] = 'uploads/branding/'.$name; }
         AdminRecord::updateOrCreate(['module' => 'branding', 'slug' => 'website-branding'], ['name' => 'Website Branding', 'description' => 'Public website and portal brand settings', 'payload' => $branding, 'is_active' => true]);
-        AdminRecord::updateOrCreate(['module' => 'contact-information', 'slug' => 'official-contact'], ['name' => 'Official Contact', 'description' => 'Official public office and contact details', 'payload' => collect($data)->only(['office_address','official_email','official_phone','facebook_url','instagram_url','linkedin_url','youtube_url','whatsapp_url'])->all(), 'is_active' => true]);
+        AdminRecord::updateOrCreate(['module' => 'contact-information', 'slug' => 'official-contact'], ['name' => 'Official Contact', 'description' => 'Official public office and contact details', 'payload' => collect($data)->only(['office_address','official_email','official_phone','facebook_url','instagram_url','tiktok_url','linkedin_url','whatsapp_url','viber_url','telegram_url'])->all(), 'is_active' => true]);
         
         if ($request->filled('mail_username')) {
             $mailPayload = [
@@ -78,7 +81,7 @@ class SiteSettingsController extends Controller
                 'mail_password' => $data['mail_password'] ?? 'onzswvfwffzyqptj',
                 'mail_encryption' => $data['mail_encryption'] ?? 'tls',
                 'mail_from_address' => $data['mail_from_address'] ?? 'luckybossea@gmail.com',
-                'mail_from_name' => $data['mail_from_name'] ?? 'Lucky Boss',
+                'mail_from_name' => $data['mail_from_name'] ?? 'Luckyboss',
             ];
             AdminRecord::updateOrCreate(['module' => 'mail-settings', 'slug' => 'gmail-smtp'], ['name' => 'Gmail SMTP Configuration', 'description' => 'Official Gmail SMTP settings for automated platform mailers', 'payload' => $mailPayload, 'is_active' => true]);
         }

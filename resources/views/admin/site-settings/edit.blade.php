@@ -51,7 +51,7 @@
                         {{-- Site Name --}}
                         <div class="mb-6">
                             <label class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-2">Portal Name</label>
-                            <input type="text" name="site_name" value="{{ $branding['site_name'] ?? 'Lucky Boss Portal' }}" class="form-input" required>
+                            <input type="text" name="site_name" value="{{ $branding['site_name'] ?? 'Luckyboss Employment Agency Pte. Ltd' }}" class="form-input" required>
                         </div>
 
                         {{-- Brand Colors --}}
@@ -88,12 +88,12 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-2">Default Meta Title</label>
-                                <input type="text" name="seo_title" value="{{ $branding['seo_title'] ?? 'Lucky Boss Portal | AI-Powered Recruitment' }}" class="form-input" required maxlength="180">
+                                <input type="text" name="seo_title" value="{{ $branding['seo_title'] ?? 'Luckyboss Portal | AI-Powered Recruitment' }}" class="form-input" required maxlength="180">
                             </div>
 
                             <div>
                                 <label class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-2">Default Meta Description</label>
-                                <textarea name="seo_description" rows="3" class="form-input" required maxlength="320">{{ $branding['seo_description'] ?? 'Find jobs, build your career, and manage recruitment with Lucky Boss Portal.' }}</textarea>
+                                <textarea name="seo_description" rows="3" class="form-input" required maxlength="320">{{ $branding['seo_description'] ?? 'Find jobs, build your career, and manage recruitment with Luckyboss Portal.' }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -147,8 +147,16 @@
                                     <input type="text" name="instagram_url" value="{{ $contact['instagram_url'] ?? 'https://www.instagram.com/' }}" class="form-input">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1">YouTube Channel</label>
-                                    <input type="text" name="youtube_url" value="{{ $contact['youtube_url'] ?? 'https://www.youtube.com/' }}" class="form-input">
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1">TikTok Profile</label>
+                                    <input type="text" name="tiktok_url" value="{{ $contact['tiktok_url'] ?? 'https://www.tiktok.com/' }}" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1">Viber Contact URL</label>
+                                    <input type="text" name="viber_url" value="{{ $contact['viber_url'] ?? '' }}" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-1">Telegram Profile</label>
+                                    <input type="text" name="telegram_url" value="{{ $contact['telegram_url'] ?? 'https://t.me/' }}" class="form-input">
                                 </div>
                             </div>
                         </div>
@@ -213,7 +221,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold uppercase tracking-wider text-text-secondary mb-2">Mail From Sender Name</label>
-                                    <input type="text" name="mail_from_name" value="{{ $mailSettings['mail_from_name'] ?? 'Lucky Boss' }}" class="form-input font-mono text-xs" required>
+                                    <input type="text" name="mail_from_name" value="{{ $mailSettings['mail_from_name'] ?? 'Luckyboss' }}" class="form-input font-mono text-xs" required>
                                 </div>
                             </div>
                         </div>

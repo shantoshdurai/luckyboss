@@ -1,4 +1,4 @@
-<x-layouts.app title="Explore Job Categories | Lucky Boss Portal">
+<x-layouts.app title="Explore Job Categories | Luckyboss Portal">
     {{-- Header Banner --}}
     <section class="bg-gradient-to-b from-[#031533] via-[#041d45] to-[#031533] text-white py-14 lg:py-18 relative overflow-hidden">
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-secondary-500/10 rounded-full blur-[100px] pointer-events-none"></div>
@@ -60,7 +60,7 @@
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
                                 <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-white/20 backdrop-blur-md border border-white/30 text-white">
-                                        {{ number_format($jobCount) }} {{ Str::plural('role', $jobCount) }}
+                                        {{ number_format($jobCount) }} Jobs Available
                                     </span>
                                 </div>
                             </div>

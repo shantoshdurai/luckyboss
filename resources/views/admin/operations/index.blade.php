@@ -1,4 +1,4 @@
-<x-admin-layout title="{{ $data['title'] }} | Lucky Boss Admin" heading="{{ $data['title'] }}">
+<x-admin-layout title="{{ $data['title'] }} | Luckyboss Admin" heading="{{ $data['title'] }}">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px">
         <div><h2 style="margin:0">{{ $data['title'] }}</h2><p style="margin:5px 0;color:#667085">Live configuration and operational records.</p></div>
         @if (in_array($area, ['packages', 'sliders', 'integrations']))

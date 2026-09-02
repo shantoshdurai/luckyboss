@@ -1,3 +1,4 @@
+<?php $branding = app(\App\Services\SiteSettingsService::class)->branding(); ?>
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="bg-white">
 <head>
@@ -5,29 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? 'Lucky Boss Portal | AI-Powered Recruitment' }}</title>
-    <meta name="description" content="{{ $description ?? 'Find jobs, build your career, and manage recruitment with Lucky Boss Portal — your growth partner in hiring.' }}">
+    <title>{{ $title ?? $branding['seo_title'] }}</title>
+    <meta name="description" content="{{ $description ?? $branding['seo_description'] }}">
 
     {{-- Open Graph --}}
-    <meta property="og:title" content="{{ $title ?? 'Lucky Boss Portal' }}">
+    <meta property="og:title" content="{{ $title ?? 'Luckyboss Portal' }}">
     <meta property="og:description" content="{{ $description ?? 'AI-Powered Recruitment Platform for Singapore, Malaysia, India and beyond.' }}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:image" content="{{ $image ?? asset($branding['logo_url']) }}">
+    <meta property="og:image:alt" content="{{ $imageAlt ?? ($title ?? $branding['site_name']) }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $title ?? $branding['seo_title'] }}">
+    <meta name="twitter:description" content="{{ $description ?? $branding['seo_description'] }}">
+    <meta name="twitter:image" content="{{ $image ?? asset($branding['logo_url']) }}">
 
     {{-- Favicon --}}
-    <link rel="icon" type="image/png" href="{{ asset('uploads/branding/favicon-20260821075904.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset($branding['favicon_url']) }}">
+    <script type="application/ld+json">@json(['@context' => 'https://schema.org', '@type' => 'Organization', 'name' => $branding['site_name']])</script>
 
     {{-- Google Fonts: Anthropic/Claude Style Editorial Serif (Newsreader) + Plus Jakarta Sans --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..800;1,6..72,400..800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    @if(file_exists(public_path('build/manifest.json')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @else
-        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-        <script defer src="{{ asset('js/app.js') }}"></script>
-    @endif
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         @keyframes pageEntrance {
@@ -57,7 +60,38 @@
     <div id="nav-loading-bar"></div>
 
     {{-- Flash Messages --}}
-    @if(session('success'))
+    @if(session('application_submitted'))
+        <div class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-navy/45 backdrop-blur-sm" x-data="{ show: true }" x-show="show" x-transition.opacity>
+            <div class="w-full max-w-md overflow-hidden rounded-3xl bg-white border border-emerald-100 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="application-success-title">
+                <div class="h-2 bg-gradient-to-r from-emerald-500 via-teal-400 to-blue-500"></div>
+                <div class="p-6 sm:p-8">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-emerald-100 text-emerald-700">
+                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold uppercase tracking-wider text-emerald-600">Application submitted</p>
+                                <h2 id="application-success-title" class="mt-1 text-xl font-heading font-extrabold text-navy">Your application is in</h2>
+                            </div>
+                        </div>
+                        <button type="button" @click="show = false" class="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-navy" aria-label="Close confirmation">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    <p class="mt-5 text-sm leading-6 text-slate-600">Your application for <strong class="text-navy">{{ session('application_submitted.job_title') }}</strong> was sent successfully.</p>
+                    <div class="mt-5 flex items-center justify-between gap-3 rounded-2xl bg-slate-50 p-4 border border-slate-200">
+                        <span class="text-xs font-semibold text-slate-500">AI match score</span>
+                        <strong class="text-2xl font-heading font-extrabold text-emerald-600">{{ session('application_submitted.score') }}%</strong>
+                    </div>
+                    <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                        <button type="button" @click="show = false" class="btn btn-outline w-full sm:w-auto text-xs font-bold">Continue browsing</button>
+                        <a href="{{ route('seeker.dashboard', ['tab' => 'applications']) }}" class="btn btn-primary w-full sm:w-auto text-center text-xs font-bold">View my applications</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @elseif(session('success'))
         <div class="fixed top-4 right-4 z-[100] animate-slide-down" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" x-transition>
             <x-ui.alert type="success" dismissible>{{ session('success') }}</x-ui.alert>
         </div>

@@ -49,7 +49,7 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Job Seeker', 'slug' => 'job-seeker'],
         ])->mapWithKeys(fn (array $role) => [$role['slug'] => Role::firstOrCreate(['slug' => $role['slug']], $role)]);
 
-        $admin = User::firstOrCreate(['email' => 'admin@luckyboss.test'], ['name' => 'Lucky Boss Admin', 'password' => 'password', 'country_code' => 'SG']);
+        $admin = User::firstOrCreate(['email' => 'admin@luckyboss.test'], ['name' => 'Luckyboss Admin', 'password' => 'password', 'country_code' => 'SG']);
         $admin->roles()->syncWithoutDetaching([$roles['super-admin']->id]);
 
         $permissions = collect(['employers.manage','candidates.manage','jobs.manage','recruitment.manage','subscriptions.manage','payments.manage','cms.manage','support.manage','api.manage','reports.view','settings.manage','security.manage'])->mapWithKeys(function (string $slug) { $permission = Permission::firstOrCreate(['slug' => $slug], ['name' => str($slug)->replace('.', ' ')->headline(), 'module' => str($slug)->before('.')]); return [$slug => $permission]; });
@@ -71,7 +71,7 @@ class DatabaseSeeder extends Seeder
             FeatureFlag::updateOrCreate(['key' => $flag['key']], $flag);
         }
 
-        $company = Company::firstOrCreate(['name' => 'Lucky Boss Demo Recruitment'], ['email' => 'hello@luckyboss.test', 'country_code' => 'SG', 'status' => 'verified', 'industry' => 'Recruitment', 'company_type_id' => $types->firstWhere('name', 'Recruitment Agency')->id, 'company_grade_id' => $grades->firstWhere('name', 'Premium')->id]);
+        $company = Company::firstOrCreate(['name' => 'Luckyboss Demo Recruitment'], ['email' => 'hello@luckyboss.test', 'country_code' => 'SG', 'status' => 'verified', 'industry' => 'Recruitment', 'company_type_id' => $types->firstWhere('name', 'Recruitment Agency')->id, 'company_grade_id' => $grades->firstWhere('name', 'Premium')->id]);
         foreach ([['code'=>'SGD','name'=>'Singapore Dollar','symbol'=>'S$'],['code'=>'INR','name'=>'Indian Rupee','symbol'=>'Rs'],['code'=>'MYR','name'=>'Malaysian Ringgit','symbol'=>'RM']] as $currency) { \App\Models\Currency::updateOrCreate(['code'=>$currency['code']],$currency); }
         foreach ([['code'=>'IN','name'=>'India'],['code'=>'SG','name'=>'Singapore']] as $country) { Country::updateOrCreate(['code'=>$country['code']], $country + ['sort_order' => 1, 'is_active' => true]); }
         $plans=[]; foreach ([['Starter',99,['job_posts'=>5,'candidate_views'=>50,'ai_matching'=>false,'byoai'=>true]],['Professional',299,['job_posts'=>25,'candidate_views'=>500,'ai_matching'=>true,'byoai'=>true]],['Enterprise',799,['job_posts'=>-1,'candidate_views'=>-1,'ai_matching'=>true,'external_candidates'=>true,'byoai'=>true]]] as [$name,$price,$entitlements]) { $plans[$name]=Package::updateOrCreate(['slug'=>str($name)->slug()],['name'=>$name,'description'=>"{$name} employer recruitment package",'validity_days'=>30,'entitlements'=>$entitlements,'is_active'=>true]); $plans[$name]->prices()->updateOrCreate(['currency_code'=>'SGD'],['amount'=>$price,'tax_rate'=>0]); }
@@ -113,7 +113,7 @@ class DatabaseSeeder extends Seeder
         SupportTicket::firstOrCreate(['subject'=>'Need help with job application'],['user_id'=>$candidate->id,'source'=>'website','message'=>'Please advise on completing my profile.','status'=>'new','priority'=>'normal']);
         PlatformNotification::firstOrCreate(['user_id' => $candidate->id, 'title' => 'Your application was shortlisted'], [
             'type' => 'application_update',
-            'body' => 'Lucky Boss Demo Recruitment shortlisted you for Warehouse Supervisor.',
+            'body' => 'Luckyboss Demo Recruitment shortlisted you for Warehouse Supervisor.',
             'sound' => 'application_update',
             'created_at' => now()->subMinutes(15),
         ]);
@@ -164,14 +164,14 @@ class DatabaseSeeder extends Seeder
             'created_at' => now()->subHours(4),
         ]);
         foreach ([
-            ['title' => 'How to Prepare for a Warehouse Supervisor Interview', 'category' => 'Interview Tips', 'short_description' => 'Practical preparation tips for leading warehouse teams and demonstrating operational confidence.', 'content' => 'A strong warehouse supervisor interview begins with specific examples. Prepare to explain how you improve safety, plan shifts, manage stock accuracy, and support your team through busy periods.', 'author' => 'Lucky Boss Team'],
-            ['title' => 'Creating a Resume That Gets Noticed', 'category' => 'Resume Tips', 'short_description' => 'A clear, focused resume helps employers quickly understand your experience and potential.', 'content' => 'Lead with your most relevant experience, use measurable outcomes where possible, and tailor your skills to the role you want. Keep your contact details current and make your availability clear.', 'author' => 'Lucky Boss Team'],
-            ['title' => 'Building a More Effective Hiring Pipeline', 'category' => 'Employer Guides', 'short_description' => 'Simple habits that help employers turn applications into confident hiring decisions.', 'content' => 'Define the outcome for every hiring stage, respond quickly to suitable applicants, and keep candidates informed. A consistent process improves both hiring quality and employer reputation.', 'author' => 'Lucky Boss Team'],
-            ['title' => 'How to Write Better Job Descriptions', 'category' => 'Employer Guides', 'short_description' => 'Clear job descriptions attract better matched applicants.', 'content' => 'Describe the outcome of the role, the essential skills, the working arrangement, and the next step. Avoid long lists of vague requirements.', 'author' => 'Lucky Boss Team'],
-            ['title' => 'Preparing for Your First Interview', 'category' => 'Interview Tips', 'short_description' => 'A practical checklist for confident job interviews.', 'content' => 'Review the role, prepare concise examples from your experience, test your meeting link, and prepare thoughtful questions for the interviewer.', 'author' => 'Lucky Boss Team'],
-            ['title' => 'Skills That Stand Out in Logistics', 'category' => 'Industry News', 'short_description' => 'The capabilities modern logistics teams value most.', 'content' => 'Safety awareness, inventory accuracy, communication, and comfort with operational systems are increasingly valuable across logistics roles.', 'author' => 'Lucky Boss Team'],
-            ['title' => 'Making Your Profile Searchable', 'category' => 'Resume Tips', 'short_description' => 'Small profile improvements that help employers find you.', 'content' => 'Use specific job titles, list your strongest skills, keep your location current, and explain measurable achievements in your work history.', 'author' => 'Lucky Boss Team'],
-            ['title' => 'Interview Feedback That Improves Hiring', 'category' => 'Employer Guides', 'short_description' => 'Turn interview notes into consistent hiring decisions.', 'content' => 'Record evidence against the role requirements, separate facts from impressions, and capture a clear recommendation while the conversation is fresh.', 'author' => 'Lucky Boss Team'],
+            ['title' => 'How to Prepare for a Warehouse Supervisor Interview', 'category' => 'Interview Tips', 'short_description' => 'Practical preparation tips for leading warehouse teams and demonstrating operational confidence.', 'content' => 'A strong warehouse supervisor interview begins with specific examples. Prepare to explain how you improve safety, plan shifts, manage stock accuracy, and support your team through busy periods.', 'author' => 'Luckyboss Team'],
+            ['title' => 'Creating a Resume That Gets Noticed', 'category' => 'Resume Tips', 'short_description' => 'A clear, focused resume helps employers quickly understand your experience and potential.', 'content' => 'Lead with your most relevant experience, use measurable outcomes where possible, and tailor your skills to the role you want. Keep your contact details current and make your availability clear.', 'author' => 'Luckyboss Team'],
+            ['title' => 'Building a More Effective Hiring Pipeline', 'category' => 'Employer Guides', 'short_description' => 'Simple habits that help employers turn applications into confident hiring decisions.', 'content' => 'Define the outcome for every hiring stage, respond quickly to suitable applicants, and keep candidates informed. A consistent process improves both hiring quality and employer reputation.', 'author' => 'Luckyboss Team'],
+            ['title' => 'How to Write Better Job Descriptions', 'category' => 'Employer Guides', 'short_description' => 'Clear job descriptions attract better matched applicants.', 'content' => 'Describe the outcome of the role, the essential skills, the working arrangement, and the next step. Avoid long lists of vague requirements.', 'author' => 'Luckyboss Team'],
+            ['title' => 'Preparing for Your First Interview', 'category' => 'Interview Tips', 'short_description' => 'A practical checklist for confident job interviews.', 'content' => 'Review the role, prepare concise examples from your experience, test your meeting link, and prepare thoughtful questions for the interviewer.', 'author' => 'Luckyboss Team'],
+            ['title' => 'Skills That Stand Out in Logistics', 'category' => 'Industry News', 'short_description' => 'The capabilities modern logistics teams value most.', 'content' => 'Safety awareness, inventory accuracy, communication, and comfort with operational systems are increasingly valuable across logistics roles.', 'author' => 'Luckyboss Team'],
+            ['title' => 'Making Your Profile Searchable', 'category' => 'Resume Tips', 'short_description' => 'Small profile improvements that help employers find you.', 'content' => 'Use specific job titles, list your strongest skills, keep your location current, and explain measurable achievements in your work history.', 'author' => 'Luckyboss Team'],
+            ['title' => 'Interview Feedback That Improves Hiring', 'category' => 'Employer Guides', 'short_description' => 'Turn interview notes into consistent hiring decisions.', 'content' => 'Record evidence against the role requirements, separate facts from impressions, and capture a clear recommendation while the conversation is fresh.', 'author' => 'Luckyboss Team'],
         ] as $post) {
             Blog::updateOrCreate(['slug' => str($post['title'])->slug()], $post + ['slug' => str($post['title'])->slug(), 'image_path' => 'images/lucky-boss-logo.png', 'is_published' => true, 'published_at' => now()->subDays(rand(1, 14))]);
         }
@@ -262,8 +262,8 @@ class DatabaseSeeder extends Seeder
                 ['name' => 'Employer Sponsorship Required', 'description' => 'Candidate requires visa sponsorship to work legally', 'payload' => ['sort_order' => 5]],
             ],
             'settings-seo' => [
-                ['name' => 'Global SEO Meta Title', 'description' => 'Default title displayed in search engines', 'payload' => ['value' => 'Lucky Boss — AI-Powered Global Recruitment & Job Marketplace']],
-                ['name' => 'Meta Description', 'description' => 'Summary snippet for Google search results', 'payload' => ['value' => 'Connect top tier talent with verified employers globally. Search thousands of vetted jobs and build your career with Lucky Boss.']],
+                ['name' => 'Global SEO Meta Title', 'description' => 'Default title displayed in search engines', 'payload' => ['value' => 'Luckyboss — AI-Powered Global Recruitment & Job Marketplace']],
+                ['name' => 'Meta Description', 'description' => 'Summary snippet for Google search results', 'payload' => ['value' => 'Connect top tier talent with verified employers globally. Search thousands of vetted jobs and build your career with Luckyboss.']],
                 ['name' => 'OpenGraph Social Share Image', 'description' => 'Preview image when links are shared on LinkedIn / Twitter', 'payload' => ['value' => '/images/lucky-boss-og-banner.png']],
             ],
             'settings-currency' => [
@@ -271,10 +271,10 @@ class DatabaseSeeder extends Seeder
                 ['name' => 'Supported Currencies', 'description' => 'Enabled currencies for subscriptions and payments', 'payload' => ['currencies' => ['USD', 'INR', 'EUR', 'GBP', 'AED', 'SGD']]],
             ],
             'settings-email-configuration' => [
-                ['name' => 'Gmail SMTP Production Service', 'description' => 'Active platform transactional email provider', 'payload' => ['host' => 'smtp.gmail.com', 'port' => 587, 'encryption' => 'tls', 'from_email' => 'luckybossea@gmail.com', 'from_name' => 'Lucky Boss Platform']],
+                ['name' => 'Gmail SMTP Production Service', 'description' => 'Active platform transactional email provider', 'payload' => ['host' => 'smtp.gmail.com', 'port' => 587, 'encryption' => 'tls', 'from_email' => 'luckybossea@gmail.com', 'from_name' => 'Luckyboss Platform']],
             ],
             'settings-maintenance-mode' => [
-                ['name' => 'Platform Maintenance Status', 'description' => 'Live maintenance mode switch and whitelist rules', 'payload' => ['is_active' => false, 'message' => 'Lucky Boss is undergoing scheduled maintenance. We will be back shortly.', 'whitelisted_ips' => ['127.0.0.1', '::1']]],
+                ['name' => 'Platform Maintenance Status', 'description' => 'Live maintenance mode switch and whitelist rules', 'payload' => ['is_active' => false, 'message' => 'Luckyboss is undergoing scheduled maintenance. We will be back shortly.', 'whitelisted_ips' => ['127.0.0.1', '::1']]],
             ],
             'settings-terms' => [
                 ['name' => 'Terms of Service v2.1', 'description' => 'Active user terms and conditions agreement', 'payload' => ['last_updated' => '2026-08-01', 'effective_date' => '2026-08-01', 'status' => 'Published']],
@@ -307,10 +307,10 @@ class DatabaseSeeder extends Seeder
                 ['name' => 'Automated Database Backups', 'description' => 'Scheduled SQLite & media file snapshot jobs', 'payload' => ['frequency' => 'Daily at 02:00 UTC', 'retention_days' => 30, 'storage' => 'local_and_cloud']],
             ],
             'mobile-apps-job-seeker-app-settings' => [
-                ['name' => 'Lucky Boss Candidate Mobile App (Flutter)', 'description' => 'Production mobile app configuration for Job Seekers', 'payload' => ['version' => '2.4.0', 'build_number' => 124, 'min_supported_version' => '2.0.0', 'force_update' => false, 'play_store_url' => 'https://play.google.com/store/apps/details?id=com.luckyboss.seeker', 'app_store_url' => 'https://apps.apple.com/app/luckyboss-jobs/id123456789']],
+                ['name' => 'Luckyboss Candidate Mobile App (Flutter)', 'description' => 'Production mobile app configuration for Job Seekers', 'payload' => ['version' => '2.4.0', 'build_number' => 124, 'min_supported_version' => '2.0.0', 'force_update' => false, 'play_store_url' => 'https://play.google.com/store/apps/details?id=com.luckyboss.seeker', 'app_store_url' => 'https://apps.apple.com/app/luckyboss-jobs/id123456789']],
             ],
             'mobile-apps-employer-app-settings' => [
-                ['name' => 'Lucky Boss Recruiter Mobile App (Flutter)', 'description' => 'Production mobile app configuration for Employers', 'payload' => ['version' => '1.8.2', 'build_number' => 82, 'min_supported_version' => '1.5.0', 'force_update' => false, 'play_store_url' => 'https://play.google.com/store/apps/details?id=com.luckyboss.recruiter', 'app_store_url' => 'https://apps.apple.com/app/luckyboss-recruiter/id987654321']],
+                ['name' => 'Luckyboss Recruiter Mobile App (Flutter)', 'description' => 'Production mobile app configuration for Employers', 'payload' => ['version' => '1.8.2', 'build_number' => 82, 'min_supported_version' => '1.5.0', 'force_update' => false, 'play_store_url' => 'https://play.google.com/store/apps/details?id=com.luckyboss.recruiter', 'app_store_url' => 'https://apps.apple.com/app/luckyboss-recruiter/id987654321']],
             ],
         ];
 

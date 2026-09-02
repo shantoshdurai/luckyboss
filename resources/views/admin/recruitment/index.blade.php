@@ -60,7 +60,7 @@
                                 </td>
                                 <td class="py-4 px-6">
                                     <span class="font-bold text-navy block text-sm">{{ $application->job->title ?? 'Position' }}</span>
-                                    <span class="text-xs text-text-secondary">{{ $application->job->company->name ?? 'Lucky Boss Partner' }}</span>
+                                    <span class="text-xs text-text-secondary">{{ $application->job->company->name ?? 'Luckyboss Partner' }}</span>
                                 </td>
                                 <td class="py-4 px-6 text-xs text-text-muted font-medium">
                                     {{ $application->applied_at ? $application->applied_at->format('M d, Y') : '-' }}

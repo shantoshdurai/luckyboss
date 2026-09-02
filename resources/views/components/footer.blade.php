@@ -1,8 +1,26 @@
 @php
+    $normalizePayload = function ($payload) {
+        if (is_array($payload)) {
+            return $payload;
+        }
+
+        if (is_object($payload)) {
+            return (array) $payload;
+        }
+
+        if (is_string($payload) && $payload !== '') {
+            $decoded = json_decode($payload, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        return [];
+    };
+
     $contact = \App\Models\AdminRecord::where('slug', 'official-contact')->first();
-    $contactData = $contact ? json_decode($contact->payload, true) : [];
+    $contactData = $normalizePayload($contact?->payload ?? []);
+
     $branding = \App\Models\AdminRecord::where('slug', 'website-branding')->first();
-    $brandData = $branding ? json_decode($branding->payload, true) : [];
+    $brandData = $normalizePayload($branding?->payload ?? []);
 @endphp
 
 <footer class="bg-navy text-white border-t border-white/10">
@@ -17,12 +35,12 @@
                     </a>
                 </div>
                 <p class="text-sm text-slate-400 leading-relaxed max-w-xs">
-                    Growth Partner in Your Hiring Journey. AI-powered recruitment for Singapore, Malaysia, India and beyond.
+                    Growth Partner in Your Hiring Journey. AI-powered recruitment for Singapore, Malaysia, India and beyond — Luckyboss Employment Agency Pte. Ltd.
                 </p>
 
                 {{-- Social Links --}}
                 <div class="flex items-center gap-3 mt-6">
-                    @foreach(['facebook' => $contactData['facebook_url'] ?? '#', 'linkedin' => $contactData['linkedin_url'] ?? '#', 'instagram' => $contactData['instagram_url'] ?? '#', 'youtube' => $contactData['youtube_url'] ?? '#'] as $platform => $url)
+                    @foreach(['facebook' => $contactData['facebook_url'] ?? 'https://www.facebook.com/', 'linkedin' => $contactData['linkedin_url'] ?? 'https://www.linkedin.com/', 'instagram' => $contactData['instagram_url'] ?? 'https://www.instagram.com/'] as $platform => $url)
                         @if($url && $url !== '#')
                         <a href="{{ $url }}" target="_blank" rel="noopener" class="w-9 h-9 rounded-lg bg-white/10 hover:bg-secondary-500 flex items-center justify-center transition-colors text-white" aria-label="{{ ucfirst($platform) }}">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -37,6 +55,18 @@
                                 @endif
                             </svg>
                         </a>
+                        @endif
+                    @endforeach
+                    @foreach([
+                        'tiktok' => $contactData['tiktok_url'] ?? 'https://www.tiktok.com/',
+                        'whatsapp' => $contactData['whatsapp_url'] ?? 'https://wa.me/',
+                        'viber' => $contactData['viber_url'] ?? 'https://www.viber.com/',
+                        'telegram' => $contactData['telegram_url'] ?? 'https://t.me/',
+                    ] as $platform => $url)
+                        @if($url)
+                            <a href="{{ $url }}" target="_blank" rel="noopener" class="w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-transform hover:-translate-y-0.5" aria-label="{{ ucfirst($platform) }}">
+                                <img src="https://cdn.simpleicons.org/{{ $platform }}/white" alt="" class="w-4 h-4" loading="lazy">
+                            </a>
                         @endif
                     @endforeach
                 </div>
@@ -82,8 +112,8 @@
     {{-- Bottom Bar --}}
     <div class="border-t border-white/10">
         <div class="container-app py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p class="text-xs text-slate-500">&copy; {{ date('Y') }} Lucky Boss Portal. All rights reserved.</p>
-            <p class="text-xs text-slate-500">Growth Partner in Your Hiring Journey</p>
+            <p class="text-xs text-slate-500">&copy; {{ date('Y') }} Luckyboss Employment Agency Pte. Ltd. All rights reserved.</p>
+            <p class="text-xs text-slate-500">Powered By: <a href="https://www.maactechnologies.com/" target="_blank" rel="noopener" class="text-secondary-400 hover:text-white">Maac Technologies</a> | All Rights Reserved.</p>
         </div>
     </div>
 </footer>

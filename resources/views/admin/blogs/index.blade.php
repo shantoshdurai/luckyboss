@@ -43,7 +43,7 @@
                                             <a href="{{ route('blogs.show', $blog->slug) }}" target="_blank" class="font-bold text-navy hover:text-accent transition-colors block truncate max-w-md">
                                                 {{ $blog->title }}
                                             </a>
-                                            <span class="text-xs text-text-muted">By {{ $blog->author ?? 'Lucky Boss Editorial' }}</span>
+                                            <span class="text-xs text-text-muted">By {{ $blog->author ?? 'Luckyboss Editorial' }}</span>
                                         </div>
                                     </div>
                                 </td>

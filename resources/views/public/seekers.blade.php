@@ -1,4 +1,4 @@
-<x-layouts.app title="For Job Seekers — Lucky Boss Global Recruitment">
+<x-layouts.app title="For Job Seekers — Luckyboss Global Recruitment">
     {{-- ═══════════════════════════════════════════════════════════
          1. HERO SECTION: LUXURY MIDNIGHT NAVY SKYLINE
     ═══════════════════════════════════════════════════════════════ --}}
@@ -85,7 +85,7 @@
         <div class="container mx-auto px-6 max-w-6xl">
             <div class="text-center max-w-2xl mx-auto mb-16">
                 <span class="text-xs font-bold uppercase tracking-widest text-secondary-600 mb-2 block">Candidate Roadmap</span>
-                <h2 class="text-3xl sm:text-4xl font-heading font-extrabold text-navy mb-3">How You Get Hired on Lucky Boss</h2>
+                <h2 class="text-3xl sm:text-4xl font-heading font-extrabold text-navy mb-3">How You Get Hired on Luckyboss</h2>
                 <p class="text-text-secondary text-sm sm:text-base">A streamlined 4-step hiring pipeline designed to put your profile in front of hiring managers.</p>
             </div>
 

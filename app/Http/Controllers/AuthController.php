@@ -23,9 +23,11 @@ class AuthController extends Controller
     /**
      * Show the login form.
      */
-    public function showLogin(): View
+    public function showLogin(Request $request): View
     {
-        return view('auth.login');
+        return view('auth.login', [
+            'adminLogin' => $request->routeIs('admin.login'),
+        ]);
     }
 
     /**
@@ -38,6 +40,22 @@ class AuthController extends Controller
         if (!Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()
                 ->withErrors(['email' => 'The supplied credentials are invalid.'])
+                ->onlyInput('email');
+        }
+
+        $user = Auth::user();
+        $selectedRole = $request->input('login_as');
+
+        // The chosen account type must match the account, unless an admin is signing in.
+        if ($selectedRole && ! $user->hasRole($selectedRole) && ! $user->hasRole('super-admin')) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            $label = $selectedRole === 'employer' ? 'an Employer' : 'a Job Seeker';
+
+            return back()
+                ->withErrors(['email' => "This account is not registered as {$label}. Choose the correct account type and try again."])
                 ->onlyInput('email');
         }
 

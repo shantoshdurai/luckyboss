@@ -1,12 +1,5 @@
-<x-layouts.app title="Sign In — Lucky Boss Portal">
-    <div class="min-h-[calc(100vh-72px)] flex" x-data="{ 
-        fillCredentials(email, pass) {
-            const emailInput = document.querySelector('input[name=email]');
-            const passInput = document.querySelector('input[name=password]');
-            if(emailInput) emailInput.value = email;
-            if(passInput) passInput.value = pass;
-        }
-    }">
+<x-layouts.app title="{{ $adminLogin ?? false ? 'Administrator Sign In' : 'Sign In — Luckyboss Portal' }}">
+    <div class="min-h-[calc(100vh-72px)] flex">
         {{-- Left: Brand Side --}}
         <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-navy via-primary-800 to-primary-900 relative overflow-hidden">
             <div class="relative z-10 flex flex-col justify-center px-12 xl:px-20 text-white">
@@ -53,30 +46,60 @@
 
                 <h2 class="text-3xl font-heading font-bold text-navy mb-2">Sign in to your account</h2>
                 <p class="text-text-muted mb-6 text-base">
+                    @if($adminLogin ?? false)
+                        Administrator access only.
+                    @else
                     Don't have an account?
                     <a href="{{ route('register.seeker') }}" class="text-accent font-semibold hover:underline">Create one free</a>
+                    @endif
                 </p>
 
-                {{-- Quick Demo Login Shortcuts --}}
-                <div class="mb-6 p-4 rounded-2xl bg-surface-sunken border border-border">
-                    <div class="text-xs font-bold uppercase tracking-wider text-text-muted mb-2.5">
-                        ⚡ Quick Demo Sign In
-                    </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <button type="button" @click="fillCredentials('admin@luckyboss.test', 'password')" class="px-2.5 py-1.5 rounded-lg bg-white border border-border text-xs font-semibold text-navy hover:border-navy transition-colors shadow-2xs">
-                            👑 Admin
-                        </button>
-                        <button type="button" @click="fillCredentials('employer@luckyboss.test', 'password')" class="px-2.5 py-1.5 rounded-lg bg-white border border-border text-xs font-semibold text-secondary-600 hover:border-secondary-500 transition-colors shadow-2xs">
-                            🏢 Employer
-                        </button>
-                        <button type="button" @click="fillCredentials('candidate@luckyboss.test', 'password')" class="px-2.5 py-1.5 rounded-lg bg-white border border-border text-xs font-semibold text-accent hover:border-accent transition-colors shadow-2xs">
-                            👤 Candidate
-                        </button>
-                    </div>
-                </div>
-
-                <form method="POST" action="{{ route('login.store') }}" class="space-y-5">
+                <form method="POST" action="{{ $adminLogin ?? false ? route('admin.login.store') : route('login.store') }}" class="space-y-5">
                     @csrf
+
+                    @if(!($adminLogin ?? false))
+                        @php $selectedRole = old('login_as', 'job-seeker'); @endphp
+
+                        {{-- Inline styles: brand tokens are not in the prebuilt Tailwind bundle. --}}
+                        <div x-data="{ role: '{{ $selectedRole }}' }">
+                            <input type="hidden" name="login_as" :value="role">
+
+                            <span class="block text-sm font-semibold text-text-primary mb-2">I am signing in as</span>
+
+                            <div class="grid grid-cols-2 gap-3" role="group" aria-label="Select account type">
+                                <button type="button"
+                                        @click="role = 'job-seeker'"
+                                        :aria-pressed="role === 'job-seeker'"
+                                        :style="role === 'job-seeker'
+                                            ? 'border-color:#2563eb; background:#eff6ff; color:#031f49; box-shadow:0 0 0 3px rgba(37,99,235,.18)'
+                                            : 'border-color:#e2e8f0; background:#fff; color:#64748b'"
+                                        class="flex items-center justify-center gap-2 rounded-xl border px-4 py-3 font-semibold text-sm transition-all">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.25a7.5 7.5 0 0 1 15 0"/>
+                                    </svg>
+                                    Job Seeker
+                                </button>
+
+                                <button type="button"
+                                        @click="role = 'employer'"
+                                        :aria-pressed="role === 'employer'"
+                                        :style="role === 'employer'
+                                            ? 'border-color:#18a66a; background:#ecfdf5; color:#031f49; box-shadow:0 0 0 3px rgba(24,166,106,.18)'
+                                            : 'border-color:#e2e8f0; background:#fff; color:#64748b'"
+                                        class="flex items-center justify-center gap-2 rounded-xl border px-4 py-3 font-semibold text-sm transition-all">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/>
+                                    </svg>
+                                    Employer
+                                </button>
+                            </div>
+
+                            <p class="mt-2 text-xs text-text-muted"
+                               x-text="role === 'employer'
+                                   ? 'Manage job postings, ATS pipelines and candidate applications.'
+                                   : 'Track your applications, saved jobs and interview invitations.'"></p>
+                        </div>
+                    @endif
 
                     <x-ui.input
                         label="Email Address"
@@ -110,12 +133,14 @@
                     </x-ui.button>
                 </form>
 
+                @if(!($adminLogin ?? false))
                 <div class="mt-8 text-center pt-6 border-t border-border">
                     <p class="text-sm text-text-muted">
                         Are you an employer?
                         <a href="{{ route('register.employer') }}" class="text-secondary-500 font-semibold hover:underline">Register your company</a>
                     </p>
                 </div>
+                @endif
             </div>
         </div>
     </div>

@@ -21,7 +21,7 @@ class JobController extends Controller
 
             if ($user->hasRole('super-admin')) {
                 return Company::first() ?: Company::create([
-                    'name' => 'Lucky Boss Global Recruitment',
+                    'name' => 'Luckyboss Global Recruitment',
                     'country_code' => 'SGP',
                     'status' => 'verified',
                 ]);
