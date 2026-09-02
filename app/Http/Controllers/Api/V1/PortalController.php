@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\JobResource;
 use App\Models\Job;
+use App\Models\JobCategory;
 use App\Models\JobApplication;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PortalController extends Controller
 {
@@ -147,41 +150,94 @@ class PortalController extends Controller
         ]);
     }
 
+    /**
+     * Posts a vacancy from the employer app.
+     *
+     * This was returning HTTP 500 for every single call — it referenced
+     * App\Models\Category, which does not exist. The core feature of the
+     * employer portal had never worked once.
+     *
+     * Three other things were wrong behind that error and would have surfaced
+     * the moment it was fixed:
+     *
+     * 1. A user with no company fell back to `Company::first()`, so a vacancy
+     *    could be published under somebody else's business.
+     * 2. `min_salary`, `max_salary`, `category_id` and `slug` are not columns on
+     *    this table. Mass assignment drops them silently, so every job would
+     *    have posted with no salary at all.
+     * 3. The missing values were invented: a salary of 4,000-7,000, a location
+     *    of Singapore and a description of "Position details". Candidates would
+     *    have applied for money no employer had offered.
+     *
+     * Nothing is invented now. A field the employer left blank stays blank, and
+     * the salary is hidden rather than guessed.
+     */
     public function postEmployerJob(Request $request)
     {
+        $this->role($request, 'employer');
+
         $data = $request->validate([
             'title' => 'required|string|max:190',
             'category' => 'nullable|string|max:100',
             'location' => 'nullable|string|max:190',
-            'salary_min' => 'nullable|numeric',
-            'salary_max' => 'nullable|numeric',
+            'salary_min' => 'nullable|numeric|min:0',
+            'salary_max' => 'nullable|numeric|min:0|gte:salary_min',
             'currency_code' => 'nullable|string|size:3',
             'country_code' => 'nullable|string|size:2',
             'work_mode' => 'nullable|string|max:50',
+            'job_type' => 'nullable|string|max:50',
+            'experience_min' => 'nullable|integer|min:0',
+            'experience_max' => 'nullable|integer|min:0',
+            'vacancies' => 'nullable|integer|min:1',
             'description' => 'nullable|string',
         ]);
 
-        $company = $request->user()?->companies()->first() ?? \App\Models\Company::first();
+        $company = $request->user()?->companies()->first();
+
+        // Refused rather than guessed. Publishing under whichever company
+        // happened to be first in the table put one business's vacancy on
+        // another's profile.
+        if ($company === null) {
+            return response()->json([
+                'message' => 'This account is not linked to a company yet. Complete your company profile before posting a vacancy.',
+            ], 422);
+        }
+
+        // Matched on what the employer chose. Falling back to the first
+        // category in the table filed warehouse jobs under whatever happened to
+        // be seeded first, and the feed is browsed by category.
+        $categoryId = null;
+        if (! empty($data['category'])) {
+            $categoryId = JobCategory::where('name', $data['category'])
+                ->orWhere('slug', Str::slug($data['category']))
+                ->value('id');
+        }
 
         $job = Job::create([
-            'company_id' => $company?->id ?? 1,
+            'company_id' => $company->id,
+            'job_category_id' => $categoryId,
             'title' => $data['title'],
-            'slug' => \Illuminate\Support\Str::slug($data['title']) . '-' . rand(1000, 9999),
-            'category_id' => \App\Models\Category::first()?->id ?? 1,
-            'location' => $data['location'] ?? 'Singapore',
-            'country_code' => $data['country_code'] ?? 'SG',
+            'description' => $data['description'] ?? '',
+            'location' => $data['location'] ?? null,
+            'country_code' => $data['country_code'] ?? $company->country_code ?? 'SG',
             'currency_code' => $data['currency_code'] ?? 'SGD',
-            'min_salary' => $data['salary_min'] ?? 4000,
-            'max_salary' => $data['salary_max'] ?? 7000,
-            'work_mode' => $data['work_mode'] ?? 'On-site',
-            'description' => $data['description'] ?? 'Position details',
+            'salary_min' => $data['salary_min'] ?? null,
+            'salary_max' => $data['salary_max'] ?? null,
+            // Nothing to show is not the same as choosing to hide it, but
+            // publishing an invented range is worse than publishing none.
+            'salary_visible' => isset($data['salary_min']),
+            'work_mode' => $data['work_mode'] ?? 'on-site',
+            'job_type' => $data['job_type'] ?? 'full-time',
+            'experience_min' => $data['experience_min'] ?? null,
+            'experience_max' => $data['experience_max'] ?? null,
+            'vacancies' => $data['vacancies'] ?? 1,
             'status' => 'published',
             'published_at' => now(),
         ]);
 
         return response()->json([
             'message' => 'Job posted successfully.',
-            'job' => $job,
+            'job' => new JobResource($job->load(['company', 'jobCategory'])),
         ], 201);
     }
 

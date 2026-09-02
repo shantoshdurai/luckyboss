@@ -48,8 +48,6 @@ Route::prefix('v1')->group(function (): void {
 
     Route::get('/jobs', [JobController::class, 'index'])->name('api.v1.jobs.index');
     Route::get('/jobs/{job}', [JobController::class, 'show'])->name('api.v1.jobs.show');
-    Route::post('/jobs', [PortalController::class, 'postEmployerJob']);
-    Route::post('/employer/jobs', [PortalController::class, 'postEmployerJob']);
 
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::get('/navigation', NavigationController::class);
@@ -66,6 +64,11 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/job-seeker/photo', [ProfilePhotoController::class, 'store']);
         Route::delete('/job-seeker/photo', [ProfilePhotoController::class, 'destroy']);
         Route::get('/employer/dashboard', [PortalController::class, 'employerDashboard']);
+        // Both sat OUTSIDE this group, so $request->user() was always null and
+        // anyone could publish a vacancy with no token at all — filed under
+        // whichever company happened to be first in the table.
+        Route::post('/jobs', [PortalController::class, 'postEmployerJob']);
+        Route::post('/employer/jobs', [PortalController::class, 'postEmployerJob']);
         // Ported from the live deployment (Thirumoorthy-a/luckybossapp), which
         // had three capabilities this tree never grew: listing an employer's own
         // vacancies, editing one after posting, and uploading a company logo.
