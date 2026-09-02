@@ -61,22 +61,66 @@ class PortalController extends Controller
             }
         })->with(['candidate.candidateProfile', 'job']);
 
-        $candidates = $query->latest('applied_at')->get()->map(function ($app) {
+        // Whether this plan may see contact details at all. Spec §14: "Phone
+        // and email should be shown based on package permission and candidate
+        // privacy rules." This used to be hardcoded true, so every plan saw
+        // every number and the contact-view limit sold in the packages meant
+        // nothing.
+        $entitlements = $company->subscriptions()
+            ->where('status', 'active')
+            ->whereDate('expires_at', '>=', today())
+            ->latest('expires_at')
+            ->value('entitlements') ?? [];
+
+        $maySeeContacts = (int) data_get($entitlements, 'candidate_views', 0) !== 0;
+
+        $candidates = $query->latest('applied_at')->get()->map(function ($app) use ($maySeeContacts) {
+            $profile = $app->candidate?->candidateProfile;
+
+            // NOTHING BELOW IS INVENTED.
+            //
+            // This map used to substitute a default for every missing field: a
+            // phone number of "+65 8000 0000", an email of
+            // "applicant@example.com", "3 yrs" of experience, a location of
+            // "Singapore", skills of ["General"] and an AI match score of 85.
+            // An employer saw a complete, confident profile of a person who had
+            // filled in almost none of it, and would have dialled a number that
+            // belongs to nobody.
+            //
+            // A missing field is now null, and the app shows "Not provided".
+            // An incomplete profile is a fact the employer needs — it is the
+            // difference between a candidate worth calling and one worth
+            // chasing for details first.
             return [
                 'id' => 'cand-' . $app->id,
-                'job_id' => 'emp-j' . $app->job_id,
-                'job_title' => $app->job->title ?? 'Position',
-                'candidate_name' => $app->candidate->name ?? 'Applicant',
-                'candidate_phone' => $app->candidate->phone ?? '+65 8000 0000',
-                'candidate_email' => $app->candidate->email ?? 'applicant@example.com',
-                'headline' => $app->candidate->candidateProfile->headline ?? 'Professional',
-                'experience' => ($app->candidate->candidateProfile->experience_years ?? 3) . ' yrs',
-                'location' => $app->candidate->candidateProfile->city ?? 'Singapore',
-                'skills' => is_array($app->candidate->candidateProfile?->skills) ? $app->candidate->candidateProfile->skills : ['General'],
-                'ai_match_score' => $app->match_score ?? 85,
-                'status' => $app->status ?? 'New',
+                // The real application id, so the portal can act on this
+                // candidate — draft a letter, move their stage — without
+                // parsing it back out of a display string.
+                'application_id' => $app->id,
+                'job_id' => $app->job_id,
+                'job_title' => $app->job?->title,
+                'candidate_name' => $app->candidate?->name,
+                'candidate_phone' => $maySeeContacts ? $app->candidate?->phone : null,
+                'candidate_email' => $maySeeContacts ? $app->candidate?->email : null,
+                'headline' => $profile?->headline,
+                'current_title' => $profile?->current_title,
+                'years_experience' => $profile?->years_experience === null ? null : (int) $profile->years_experience,
+                'location' => $profile?->current_location,
+                'skills' => is_array($profile?->skills) ? $profile->skills : [],
+                'languages' => is_array($profile?->languages) ? $profile->languages : [],
+                'availability' => $profile?->availability,
+                // Null rather than a flattering default. A score of 85 that
+                // nothing computed is the most persuasive number on the screen
+                // and the least true.
+                // Cast, because the column is `numeric` and SQLite hands it
+                // back as a string — which a typed client parses as null and
+                // then renders as "no match".
+                'ai_match_score' => $app->match_score === null ? null : (float) $app->match_score,
+                'status' => $app->status,
                 'source' => 'applied',
-                'contact_revealed' => true,
+                'contact_revealed' => $maySeeContacts,
+                'profile_completion' => $profile?->profile_completion,
+                'applied_at' => $app->applied_at,
                 'last_activity' => $app->last_activity_at ?? $app->created_at,
             ];
         });
