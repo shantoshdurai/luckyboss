@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\JobResource;
 use App\Models\Job;
+use App\Services\JobViewRecorder;
 use Illuminate\Http\Request;
 
 class JobController extends Controller
@@ -19,10 +20,14 @@ class JobController extends Controller
         return JobResource::collection($jobs);
     }
 
-    public function show(Job $job): JobResource
+    public function show(Job $job, Request $request, JobViewRecorder $views): JobResource
     {
         abort_unless($job->status === 'published', 404);
 
-        return new JobResource($job->load('company'));
+        // Recorded here rather than in the app so a view counts once, from one
+        // place, whether it came from the mobile app or the public site.
+        $views->record($job, $request, 'app');
+
+        return new JobResource($job->load(['company', 'jobCategory']));
     }
 }

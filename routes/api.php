@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\EmployerAiController;
+use App\Http\Controllers\Api\V1\EmployerInsightsController;
 use App\Http\Controllers\Api\V1\EmployerJobController;
 use App\Http\Controllers\Api\V1\FirebaseAuthController;
 use App\Http\Controllers\Api\V1\MediaController;
@@ -71,6 +72,12 @@ Route::prefix('v1')->group(function (): void {
         // the entitlement to be enforced here, not by hiding a button in the
         // app. A denied request still answers, from the rule-based engine, and
         // never spends a Gemini call.
+        // What the plan gives them and what it has produced. The portal sold a
+        // subscription without showing what was in it, and a boost without ever
+        // reporting what it did.
+        Route::get('/employer/insights', [EmployerInsightsController::class, 'overview']);
+        Route::get('/employer/jobs/{job}/insights', [EmployerInsightsController::class, 'job']);
+
         Route::get('/employer/ai/status', [EmployerAiController::class, 'status']);
         Route::post('/employer/ai/job-description', [EmployerAiController::class, 'jobDescription'])->middleware('throttle:20,1');
         Route::post('/employer/ai/interview-questions', [EmployerAiController::class, 'interviewQuestions'])->middleware('throttle:20,1');
