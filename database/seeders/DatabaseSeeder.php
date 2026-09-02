@@ -67,6 +67,12 @@ class DatabaseSeeder extends Seeder
             ['key' => 'external_candidates_enabled', 'name' => 'External Candidates', 'is_enabled' => false],
             ['key' => 'candidate_monetization_enabled', 'name' => 'Candidate Monetization', 'is_enabled' => false],
             ['key' => 'google_calendar_enabled', 'name' => 'Google Calendar', 'is_enabled' => false],
+            // Spec section 3 names each AI feature separately so an admin can
+            // run the chatbot while leaving letter generation off, or the
+            // reverse. One master switch would not allow that.
+            ['key' => 'ai_offer_letter_enabled', 'name' => 'AI Offer Letter Generator', 'is_enabled' => true],
+            ['key' => 'ai_interview_letter_enabled', 'name' => 'AI Interview Letter Generator', 'is_enabled' => true],
+            ['key' => 'ai_email_generator_enabled', 'name' => 'AI Email Generator', 'is_enabled' => true],
         ] as $flag) {
             FeatureFlag::updateOrCreate(['key' => $flag['key']], $flag);
         }

@@ -7,6 +7,7 @@ use App\Models\ApiIntegration;
 use App\Models\FeatureFlag;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class AiApiController extends Controller
@@ -22,7 +23,17 @@ class AiApiController extends Controller
 
     public function updateFlag(Request $request, FeatureFlag $flag): RedirectResponse
     {
-        $this->ensureAdmin(); $flag->update(['is_enabled' => $request->boolean('is_enabled')]); return back()->with('success', 'Feature flag updated.');
+        $this->ensureAdmin();
+
+        $flag->update(['is_enabled' => $request->boolean('is_enabled')]);
+
+        // FeatureFlagService caches each flag for five minutes. Without this an
+        // admin switching AI off during an incident would watch it stay on for
+        // another five minutes, which is exactly when a switch has to be
+        // immediate.
+        Cache::forget("feature-flag:{$flag->key}");
+
+        return back()->with('success', 'Feature flag updated.');
     }
 
     public function updateIntegration(Request $request, ApiIntegration $integration): RedirectResponse

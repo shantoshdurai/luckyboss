@@ -89,6 +89,9 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/employer/ai/status', [EmployerAiController::class, 'status']);
         Route::post('/employer/ai/job-description', [EmployerAiController::class, 'jobDescription'])->middleware('throttle:20,1');
         Route::post('/employer/ai/interview-questions', [EmployerAiController::class, 'interviewQuestions'])->middleware('throttle:20,1');
+        // Offer letters, interview invitations and status emails - spec section 3
+        // names all three. Drafts only; nothing here sends anything.
+        Route::post('/employer/ai/letter', [EmployerAiController::class, 'letter'])->middleware('throttle:30,1');
         Route::get('/employer/jobs/{job}/ai-shortlist', [EmployerAiController::class, 'shortlist'])->middleware('throttle:30,1');
         // Legacy alias: the live site's apps call this path for the candidate
         // photo. Our own /job-seeker/photo stays the canonical route.

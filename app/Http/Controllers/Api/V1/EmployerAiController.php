@@ -8,6 +8,7 @@ use App\Models\Job;
 use App\Models\JobApplication;
 use App\Services\AIRecruitmentEngineService;
 use App\Services\EmployerAiGate;
+use App\Services\RecruitmentLetterService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -30,7 +31,70 @@ class EmployerAiController extends Controller
     public function __construct(
         private readonly AIRecruitmentEngineService $engine,
         private readonly EmployerAiGate $gate,
+        private readonly RecruitmentLetterService $letters,
     ) {
+    }
+
+    /**
+     * Drafts an offer letter, an interview invitation or a status email.
+     *
+     * The single biggest time saving in the product: an agency writes these
+     * dozens of times a week and they all say nearly the same thing.
+     *
+     * Nothing is sent. Every letter comes back as a draft for the employer to
+     * read, because a wrong salary in an offer letter is a legal problem rather
+     * than a typo — and the facts are read from our own records, never from the
+     * request body, so a client cannot address somebody else's offer to a
+     * candidate of its choosing.
+     */
+    public function letter(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'type' => ['required', 'in:offer,interview,status'],
+            'application_id' => ['required', 'integer'],
+            'salary' => ['nullable', 'numeric', 'min:0'],
+            'currency' => ['nullable', 'string', 'size:3'],
+            'start_date' => ['nullable', 'string', 'max:40'],
+            'interview_at' => ['nullable', 'string', 'max:60'],
+            'interview_mode' => ['nullable', 'string', 'max:60'],
+            'decision' => ['nullable', 'in:progressing,rejected'],
+        ]);
+
+        $company = $this->company($request);
+
+        // Scoped to this company's own vacancies. Without the join an employer
+        // could draft a letter against a competitor's applicant by guessing an
+        // id, and read that candidate's name back in the response.
+        $application = JobApplication::where('id', $data['application_id'])
+            ->whereHas('job', fn ($q) => $q->where('company_id', $company?->id))
+            ->with(['candidate', 'job.company'])
+            ->firstOrFail();
+
+        $decision = $this->gate->decide($company);
+
+        $letter = $this->letters->draft(
+            $data['type'],
+            $application,
+            $application->job,
+            collect($data)->only(['salary', 'currency', 'start_date', 'interview_at', 'interview_mode', 'decision'])->all(),
+            allowAi: $decision['allowed'],
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'ai' => $decision['allowed'] && $letter['provider'] !== 'local_template',
+            'source' => $decision['source'] ?? 'rule-based',
+            'provider' => $letter['provider'],
+            'upgrade_required' => $decision['upgrade_required'],
+            'message' => $decision['reason'],
+            'data' => [
+                'subject' => $letter['subject'],
+                'body' => $letter['body'],
+                // Returned so the app can show the employer exactly which facts
+                // the draft was built from before they send it.
+                'facts' => $letter['facts'],
+            ],
+        ]);
     }
 
     /**
