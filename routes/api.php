@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AppSettingsController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\EmployerAiController;
 use App\Http\Controllers\Api\V1\EmployerInsightsController;
@@ -25,6 +26,12 @@ Route::post('/ai-chat', \App\Http\Controllers\Api\AiChatController::class);
 
 Route::prefix('v1')->group(function (): void {
     Route::post('/webhooks/payments/{gateway}', [WebhookController::class,'payment'])->middleware('throttle:30,1');
+    // What the apps may show. Read side of the admin Feature Control screen
+    // (spec section 3). Unauthenticated: the app needs it before anyone signs
+    // in, and it describes the product, not a person. Hiding a button is never
+    // the control — every gated endpoint still checks the flag itself.
+    Route::get('/app-settings', AppSettingsController::class);
+
     Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
     Route::post('/auth/job-seekers/register', [AuthController::class, 'registerSeeker']);
     Route::post('/auth/employers/register', [AuthController::class, 'registerEmployer']);
@@ -47,6 +54,7 @@ Route::prefix('v1')->group(function (): void {
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::get('/navigation', NavigationController::class);
         Route::get('/job-seeker/dashboard', [PortalController::class, 'seekerDashboard']);
+        Route::get('/job-seeker/insights', [AppSettingsController::class, 'seekerInsights']);
         // The profile the app reads on launch and writes on every edit. Without
         // these the wizard's answers lived only in memory.
         Route::get('/job-seeker/profile', [SeekerProfileController::class, 'show']);
