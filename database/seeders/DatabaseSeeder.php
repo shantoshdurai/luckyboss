@@ -110,6 +110,24 @@ class DatabaseSeeder extends Seeder
         $employer->roles()->syncWithoutDetaching([$roles['employer']->id]); $company->users()->syncWithoutDetaching([$employer->id => ['company_role' => 'company-admin', 'is_active' => true]]);
         $candidate = User::firstOrCreate(['email' => 'candidate@luckyboss.test'], ['name' => 'Maya Tan', 'phone' => '+6587654321', 'country_code' => 'SG', 'password' => 'password']);
         $candidate->roles()->syncWithoutDetaching([$roles['job-seeker']->id]); $candidate->candidateProfile()->firstOrCreate([], ['country_code' => 'SG', 'current_title' => 'Warehouse Coordinator', 'current_location' => 'Singapore', 'preferred_location' => 'Singapore', 'years_experience' => 4, 'profile_completion' => 65]);
+        // A candidate who has actually applied.
+        //
+        // The seeder imported JobApplication and never created one, so the
+        // employer pipeline and the admin recruitment screens seeded empty —
+        // and four tests that call JobApplication::firstOrFail() could never
+        // pass. It also meant a fresh install showed an employer a pipeline
+        // with nothing in it, which reads as broken rather than as new.
+        JobApplication::firstOrCreate(
+            ['job_id' => $job->id, 'candidate_id' => $candidate->id],
+            [
+                'source' => 'website',
+                'status' => 'Applied',
+                'match_score' => 82,
+                'applied_at' => now()->subDays(2),
+                'last_activity_at' => now()->subDays(2),
+            ]
+        );
+
         SupportTicket::firstOrCreate(['subject'=>'Need help with job application'],['user_id'=>$candidate->id,'source'=>'website','message'=>'Please advise on completing my profile.','status'=>'new','priority'=>'normal']);
         PlatformNotification::firstOrCreate(['user_id' => $candidate->id, 'title' => 'Your application was shortlisted'], [
             'type' => 'application_update',
