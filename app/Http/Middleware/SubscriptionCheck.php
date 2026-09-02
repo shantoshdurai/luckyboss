@@ -29,7 +29,7 @@ class SubscriptionCheck
         // Check for active subscription
         $hasActiveSubscription = $company->subscriptions()
             ->where('status', 'active')
-            ->where('ends_at', '>', now())
+            ->whereDate('expires_at', '>=', today())
             ->exists();
 
         if (!$hasActiveSubscription) {

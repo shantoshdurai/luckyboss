@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\EmployerAiController;
 use App\Http\Controllers\Api\V1\EmployerJobController;
 use App\Http\Controllers\Api\V1\FirebaseAuthController;
 use App\Http\Controllers\Api\V1\MediaController;
@@ -64,6 +65,16 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/employer/jobs', [EmployerJobController::class, 'index']);
         Route::post('/employer/jobs/{job}', [EmployerJobController::class, 'update']);
         Route::post('/employer/company/logo', [MediaController::class, 'companyLogo']);
+
+        // The AI the employer subscription is actually sold on. Every action
+        // re-checks the plan through EmployerAiGate — spec section 93 requires
+        // the entitlement to be enforced here, not by hiding a button in the
+        // app. A denied request still answers, from the rule-based engine, and
+        // never spends a Gemini call.
+        Route::get('/employer/ai/status', [EmployerAiController::class, 'status']);
+        Route::post('/employer/ai/job-description', [EmployerAiController::class, 'jobDescription'])->middleware('throttle:20,1');
+        Route::post('/employer/ai/interview-questions', [EmployerAiController::class, 'interviewQuestions'])->middleware('throttle:20,1');
+        Route::get('/employer/jobs/{job}/ai-shortlist', [EmployerAiController::class, 'shortlist'])->middleware('throttle:30,1');
         // Legacy alias: the live site's apps call this path for the candidate
         // photo. Our own /job-seeker/photo stays the canonical route.
         Route::post('/job-seeker/profile/photo', [MediaController::class, 'candidatePhoto']);

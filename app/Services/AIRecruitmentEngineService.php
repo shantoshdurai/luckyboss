@@ -457,13 +457,14 @@ class AIRecruitmentEngineService
         ];
     }
 
-    public function generateInterviewQuestions(Job $job, User $candidate): array
+    /** @param bool $allowAi See generateJobDescription(). */
+    public function generateInterviewQuestions(Job $job, User $candidate, bool $allowAi = true): array
     {
         $geminiKey = config('services.gemini.api_key', env('GEMINI_API_KEY'));
         $geminiModel = config('services.gemini.model', env('GEMINI_MODEL', 'gemini-2.5-flash'));
         $isAiEnabled = FeatureFlag::where('key', 'platform_ai_enabled')->value('is_enabled') ?? true;
 
-        if ($isAiEnabled && $geminiKey) {
+        if ($allowAi && $isAiEnabled && $geminiKey) {
             try {
                 $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$geminiModel}:generateContent?key=" . urlencode($geminiKey);
                 $prompt = "Generate 5 smart, professional interview questions for a candidate applying for the position of '{$job->title}' in {$job->location}.
@@ -505,13 +506,20 @@ Respond ONLY with valid JSON: {\"questions\": [\"Question 1\", \"Question 2\", \
     /**
      * Generate or Enhance Job Description using Gemini AI
      */
-    public function generateJobDescription(string $title, string $category = '', string $location = 'Singapore'): array
+    /**
+     * @param bool $allowAi Pass false to force the template path without
+     *                      touching the paid API. Used when the employer's
+     *                      subscription does not include AI: the caller still
+     *                      wants a usable draft, but a plan that was not paid
+     *                      for must never spend a Gemini call.
+     */
+    public function generateJobDescription(string $title, string $category = '', string $location = 'Singapore', bool $allowAi = true): array
     {
         $geminiKey = config('services.gemini.api_key', env('GEMINI_API_KEY'));
         $geminiModel = config('services.gemini.model', env('GEMINI_MODEL', 'gemini-2.5-flash'));
         $isAiEnabled = FeatureFlag::where('key', 'platform_ai_enabled')->value('is_enabled') ?? true;
 
-        if ($isAiEnabled && $geminiKey) {
+        if ($allowAi && $isAiEnabled && $geminiKey) {
             try {
                 $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$geminiModel}:generateContent?key=" . urlencode($geminiKey);
                 $prompt = "Draft a professional job vacancy posting for '{$title}' in {$location} (Category: {$category}).
