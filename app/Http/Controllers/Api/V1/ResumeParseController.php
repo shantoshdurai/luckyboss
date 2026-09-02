@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Api\Concerns\HandlesApiUploads;
 use App\Http\Controllers\Controller;
 use App\Models\FeatureFlag;
 use Illuminate\Http\JsonResponse;
@@ -28,6 +29,8 @@ use Illuminate\Support\Facades\Log;
  */
 class ResumeParseController extends Controller
 {
+    use HandlesApiUploads;
+
     /** Gemini's inline-data limit for a single request, with headroom. */
     private const MAX_KB = 4096;
 
@@ -44,14 +47,34 @@ class ResumeParseController extends Controller
             'resume.max' => 'That file is too large. Keep it under 4 MB.',
         ]);
 
+        /** @var UploadedFile $file */
+        $file = $request->file('resume');
+
+        // Read the bytes up front. storePublicUpload() *moves* the temp file,
+        // so anything reading $file->getRealPath() afterwards gets nothing —
+        // which would have silently broken parsing for every upload.
+        $contents = file_get_contents($file->getRealPath());
+        $mimeType = $file->getMimeType();
+
+        // The document is kept whatever happens next.
+        //
+        // Autofill used to return 403 and throw the upload away, so a candidate
+        // who attached their CV and was then told to type everything by hand
+        // had every reason to believe the app had lost it — and the employer
+        // never received the CV that was actually sent. Parsing is a
+        // convenience on top of storing the file; storing it is the part that
+        // must not depend on an AI switch.
+        $stored = $this->keepResume($request, $file);
+
         $aiEnabled = FeatureFlag::where('key', 'platform_ai_enabled')->value('is_enabled') ?? true;
         $parserEnabled = FeatureFlag::where('key', 'ai_resume_parser_enabled')->value('is_enabled') ?? false;
 
         if (! $aiEnabled || ! $parserEnabled) {
             return response()->json([
                 'status' => 'disabled',
-                'message' => 'Resume autofill is switched off. Please enter your details manually.',
-            ], 403);
+                'message' => 'Your resume has been saved. Autofill is switched off, so please enter your details below.',
+                'resume' => $stored,
+            ]);
         }
 
         $key = config('services.gemini.api_key', env('GEMINI_API_KEY'));
@@ -60,15 +83,13 @@ class ResumeParseController extends Controller
 
             return response()->json([
                 'status' => 'unavailable',
-                'message' => 'Resume autofill is temporarily unavailable. Please enter your details manually.',
-            ], 503);
+                'message' => 'Your resume has been saved. Autofill is temporarily unavailable, so please enter your details below.',
+                'resume' => $stored,
+            ]);
         }
 
-        /** @var UploadedFile $file */
-        $file = $request->file('resume');
-
         try {
-            $extracted = $this->extract($file, $key);
+            $extracted = $this->extract($contents, $mimeType, $key);
         } catch (\Throwable $e) {
             Log::warning('[ResumeParse] '.$e->getMessage());
             $extracted = null;
@@ -77,8 +98,9 @@ class ResumeParseController extends Controller
         if ($extracted === null) {
             return response()->json([
                 'status' => 'unreadable',
-                'message' => 'We could not read that resume. Please enter your details manually.',
-            ], 422);
+                'message' => 'Your resume has been saved, but we could not read it automatically. Please enter your details below.',
+                'resume' => $stored,
+            ]);
         }
 
         return response()->json([
@@ -87,14 +109,48 @@ class ResumeParseController extends Controller
             // values to check, not as though the candidate typed them.
             'requires_review' => true,
             'data' => $extracted,
+            'resume' => $stored,
         ]);
+    }
+
+    /**
+     * Saves the document against the candidate's profile and returns what the
+     * app needs to show it.
+     *
+     * Failure here is logged and swallowed: a storage problem must not turn a
+     * working upload into an error the candidate cannot act on, and parsing may
+     * still succeed and fill their profile.
+     *
+     * @return array{file_name:string, url:?string, stored:bool}
+     */
+    private function keepResume(Request $request, UploadedFile $file): array
+    {
+        $originalName = $file->getClientOriginalName();
+
+        try {
+            $path = $this->storePublicUpload($file, 'resumes', 'resume');
+
+            $profile = $request->user()?->candidateProfile;
+            if ($profile !== null) {
+                $profile->forceFill([
+                    'resume_file_name' => $originalName,
+                    'resume_path' => $path,
+                ])->save();
+            }
+
+            return ['file_name' => $originalName, 'url' => asset($path), 'stored' => true];
+        } catch (\Throwable $e) {
+            Log::warning('[ResumeParse] could not store the resume: '.$e->getMessage());
+
+            return ['file_name' => $originalName, 'url' => null, 'stored' => false];
+        }
     }
 
     /**
      * Sends the document to Gemini's multimodal endpoint and returns structured
      * fields, or null when nothing usable came back.
      */
-    private function extract(UploadedFile $file, string $key): ?array
+    private function extract(string $contents, string $mimeType, string $key): ?array
     {
         $model = config('services.gemini.model', env('GEMINI_MODEL', 'gemini-2.5-flash'));
 
@@ -130,8 +186,8 @@ PROMPT;
                             ['text' => $prompt],
                             [
                                 'inline_data' => [
-                                    'mime_type' => $file->getMimeType(),
-                                    'data' => base64_encode(file_get_contents($file->getRealPath())),
+                                    'mime_type' => $mimeType,
+                                    'data' => base64_encode($contents),
                                 ],
                             ],
                         ],
