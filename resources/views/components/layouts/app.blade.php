@@ -1,4 +1,17 @@
-@props(['bare' => false])
+{{-- Every attribute this layout reads must be declared here.
+     Declaring @props at all changes the rules: undeclared attributes stop
+     being extracted as variables and go to $attributes instead. Adding only
+     `bare` silently emptied $title and $description, so every page on the site
+     fell through to the same site-wide SEO title — identical titles on the
+     homepage, every vacancy and every blog post, which is as bad for search as
+     having none. --}}
+@props([
+    'bare' => false,
+    'title' => null,
+    'description' => null,
+    'image' => null,
+    'imageAlt' => null,
+])
 <?php $branding = app(\App\Services\SiteSettingsService::class)->branding(); ?>
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="bg-white">

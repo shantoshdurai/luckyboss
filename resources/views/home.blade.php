@@ -1,145 +1,133 @@
 <x-layouts.app title="Luckyboss Employment Agency Pte. Ltd | AI-Powered Recruitment Platform">
     {{-- ═══════════════════════════════════════════════════════════
-         1. HERO SECTION: Full-Screen 100vh Majestic Command Center
+         1. HERO — ASK, THEN ROUTE
+
+         Rebuilt after sir shared tickbig.com. Their homepage does not open with
+         a pitch; it asks the visitor what they came for and sends them there.
+         That is the part worth taking, and it suits us better than it suits
+         them, because Luckyboss has exactly two audiences who need completely
+         different things.
+
+         What is deliberately not copied: the near-black ground, which would
+         fight a navy-and-emerald brand, and the empty stage. TickBig can afford
+         a first screen with nothing on it. A jobs site cannot — the vacancies
+         are the product, and they are what Google indexes.
+
+         What went with the old hero: a 2,000px stock photograph pulled from
+         unsplash.com on every page load. The most important page on the site
+         depended on a third party we do not control, and it was a picture of
+         nobody's warehouse.
     ═══════════════════════════════════════════════════════════════ --}}
-    <section class="min-h-[calc(100vh-80px)] flex flex-col justify-center text-white py-12 lg:py-16 relative overflow-hidden bg-cover bg-right bg-no-repeat"
-             style="background-color: #031533; background-image: linear-gradient(to right, #031533 0%, rgba(3, 21, 51, 0.95) 45%, rgba(3, 21, 51, 0.82) 65%, rgba(3, 21, 51, 0.45) 100%), url('https://images.unsplash.com/photo-1596422846543-75c6fc197f07?q=80&w=2000&auto=format&fit=crop');">
-        {{-- Ambient Soft Glow --}}
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-gradient-to-b from-accent/15 to-secondary-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+    <section class="relative" style="background:#F7F9FC;">
+        <div class="container mx-auto px-6 pt-16 pb-14 sm:pt-24 sm:pb-20 max-w-4xl text-center">
 
-        <div class="container mx-auto px-6 relative z-10 text-center max-w-5xl">
-            {{-- Thoughtful Minimalist Tag --}}
-            <div class="inline-flex items-center gap-2.5 py-1 px-4 rounded-full bg-white/10 border border-white/15 text-xs font-semibold tracking-wider text-slate-300 mb-6 backdrop-blur-md">
-                <span class="w-2 h-2 rounded-full bg-secondary-400 animate-pulse"></span>
-                <span>AI-Powered Cross-Border Recruitment</span>
-            </div>
-
-            {{-- Anthropic/Claude Style Editorial Headline --}}
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-serif font-normal tracking-tight leading-[1.18] mb-5 !text-white">
-                <span class="text-white block mb-1.5 italic font-serif">Find the right job.</span>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-sky-200 not-italic font-sans font-extrabold tracking-tight">
-                    Build an exceptional career.
-                </span>
-            </h1>
-
-            {{-- Subheading --}}
-            <p class="text-base sm:text-lg text-blue-100/80 mb-8 max-w-2xl mx-auto font-sans font-normal leading-relaxed">
-                Connect directly with verified corporate employers and leading recruitment agencies across Singapore, Malaysia, and India.
+            <p class="text-xs font-bold uppercase tracking-[0.16em] mb-5" style="color:#18A66A;">
+                Singapore &middot; Malaysia &middot; India
             </p>
 
-            {{-- Dark Frosted Glass Search Command Bar --}}
-            <div class="bg-[#062454]/80 backdrop-blur-2xl p-2.5 sm:p-3 rounded-3xl shadow-2xl border border-white/15 max-w-4xl mx-auto text-left text-white">
-                <form action="{{ route('jobs.index') }}" method="GET" class="flex flex-col md:flex-row gap-2.5">
-                    {{-- Keyword Input with Suggestions --}}
-                    <div class="flex-1 relative" x-data="{ term: '', suggestions: [], show: false }">
-                        <div class="flex items-center pl-4 bg-white/10 rounded-2xl h-13 border border-white/15 focus-within:border-secondary-400 focus-within:ring-2 focus-within:ring-secondary-400/30 focus-within:shadow-[0_0_15px_rgba(24,166,106,0.25)] transition-all duration-200">
-                            <svg class="w-5 h-5 text-blue-200/70 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            <input 
-                                type="text" 
-                                name="keyword" 
-                                placeholder="Job title, skills, keyword..." 
-                                class="w-full bg-transparent border-0 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 text-white placeholder:text-blue-200/60 px-3 text-sm h-full"
-                                x-model="term"
-                                @input.debounce.300ms="
-                                    if(term.length > 1) {
-                                        fetch('{{ route('jobs.suggestions') }}?field=title&q=' + encodeURIComponent(term))
-                                            .then(res => res.json())
-                                            .then(data => { suggestions = data; show = true; });
-                                    } else {
-                                        show = false;
-                                    }
-                                "
-                                @click.away="show = false"
-                                autocomplete="off"
-                            >
-                        </div>
-                        <div x-show="show && suggestions.length > 0" class="absolute top-full left-0 right-0 bg-[#031533] border border-white/20 shadow-2xl rounded-2xl mt-1.5 z-50 overflow-hidden text-white" style="display: none;">
-                            <template x-for="s in suggestions" :key="s">
-                                <div @click="term = s; show = false;" class="px-4 py-3 hover:bg-white/10 cursor-pointer text-slate-200 text-sm font-semibold transition-colors" x-text="s"></div>
-                            </template>
-                        </div>
-                    </div>
-                    
-                    {{-- Location Input --}}
-                    <div class="flex-1 relative" x-data="{ loc: '', suggestions: [], show: false }">
-                        <div class="flex items-center pl-4 bg-white/10 rounded-2xl h-13 border border-white/15 focus-within:border-secondary-400 focus-within:ring-2 focus-within:ring-secondary-400/30 focus-within:shadow-[0_0_15px_rgba(24,166,106,0.25)] transition-all duration-200">
-                            <svg class="w-5 h-5 text-blue-200/70 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            <input 
-                                type="text" 
-                                name="location" 
-                                placeholder="City or Country (e.g. Singapore)" 
-                                class="w-full bg-transparent border-0 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 text-white placeholder:text-blue-200/60 px-3 text-sm h-full"
-                                x-model="loc"
-                                @input.debounce.300ms="
-                                    if(loc.length > 1) {
-                                        fetch('{{ route('jobs.suggestions') }}?field=location&q=' + encodeURIComponent(loc))
-                                            .then(res => res.json())
-                                            .then(data => { suggestions = data; show = true; });
-                                    } else {
-                                        show = false;
-                                    }
-                                "
-                                @click.away="show = false"
-                                autocomplete="off"
-                            >
-                        </div>
-                        <div x-show="show && suggestions.length > 0" class="absolute top-full left-0 right-0 bg-[#031533] border border-white/20 shadow-2xl rounded-2xl mt-1.5 z-50 overflow-hidden text-white" style="display: none;">
-                            <template x-for="s in suggestions" :key="s">
-                                <div @click="loc = s; show = false;" class="px-4 py-3 hover:bg-white/10 cursor-pointer text-slate-200 text-sm font-semibold transition-colors" x-text="s"></div>
-                            </template>
-                        </div>
-                    </div>
+            <h1 class="font-heading font-bold tracking-tight leading-[1.1] mb-4 text-[34px] sm:text-[46px] lg:text-[54px]" style="color:#031F49;">
+                What brings you here today?
+            </h1>
 
-                    {{-- Search Submit --}}
-                    <button type="submit" class="bg-secondary-500 hover:bg-secondary-600 text-white font-bold rounded-2xl px-9 h-13 transition-all duration-200 shadow-md hover:shadow-xl flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer text-sm font-sans">
-                        <span>Find Jobs</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                    </button>
-                </form>
+            <p class="text-base sm:text-lg mb-10 max-w-xl mx-auto" style="color:#5A6C82;">
+                Pick one and we will take you straight to it.
+            </p>
+
+            {{-- One field, not the three-part glass console this replaced.
+                 A jobs site without a search box on its front page is a worse
+                 product however clean it looks, so the capability stays; only
+                 the furniture around it went. --}}
+            <form action="{{ route('jobs.index') }}" method="GET"
+                  class="flex items-stretch gap-2 max-w-xl mx-auto mb-10">
+                <label for="keyword" class="sr-only">Search jobs</label>
+                <input id="keyword" name="keyword" type="search"
+                       value="{{ request('keyword') }}"
+                       placeholder="Job title, trade or skill"
+                       class="flex-1 rounded-xl px-4 py-3.5 text-[15px] outline-none transition-all"
+                       style="border:1px solid #E4EAF2;background:#fff;color:#031F49;"
+                       onfocus="this.style.borderColor='#18A66A';this.style.boxShadow='0 0 0 3px rgba(24,166,106,.14)'"
+                       onblur="this.style.borderColor='#E4EAF2';this.style.boxShadow='none'">
+                <button type="submit"
+                        class="rounded-xl px-6 font-bold text-[15px] transition-all"
+                        style="background:#031F49;color:#fff;"
+                        onmouseover="this.style.background='#052a63'"
+                        onmouseout="this.style.background='#031F49'">
+                    Search
+                </button>
+            </form>
+
+            {{-- The four real doors into the product. Every one goes to a page
+                 that exists; nothing here is a placeholder. --}}
+            @php
+                $doors = [
+                    [
+                        'label' => 'Find a job',
+                        'note' => $stats['activeJobs'] . ' open now',
+                        'href' => route('jobs.index'),
+                        'icon' => 'M20.25 14.15v4.073a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a12.06 12.06 0 0 1-6.596 0l-1.32-.377a2.25 2.25 0 0 1-1.632-2.163V14.15M3.75 8.25v10.5a2.25 2.25 0 0 0 2.25 2.25h12a2.25 2.25 0 0 0 2.25-2.25V8.25M3.75 8.25h16.5M9 5.25V4.5A1.5 1.5 0 0 1 10.5 3h3a1.5 1.5 0 0 1 1.5 1.5v.75',
+                    ],
+                    [
+                        'label' => 'Hire workers',
+                        'note' => 'Post a vacancy',
+                        'href' => route('register.employer'),
+                        'icon' => 'M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
+                    ],
+                    [
+                        'label' => 'Browse by trade',
+                        'note' => 'Construction, driving, care',
+                        'href' => route('categories.index'),
+                        'icon' => 'M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085',
+                    ],
+                    [
+                        'label' => 'I have an account',
+                        'note' => 'Sign in',
+                        'href' => route('login'),
+                        'icon' => 'M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25',
+                    ],
+                ];
+            @endphp
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-10">
+                @foreach($doors as $door)
+                    <a href="{{ $door['href'] }}"
+                       class="group rounded-2xl px-4 py-6 sm:py-7 text-left transition-all"
+                       style="background:#FFFFFF;border:1px solid #E4EAF2;box-shadow:0 1px 2px rgba(3,31,73,.04);"
+                       onmouseover="this.style.borderColor='#18A66A';this.style.transform='translateY(-2px)';this.style.boxShadow='0 12px 28px -18px rgba(3,31,73,.4)'"
+                       onmouseout="this.style.borderColor='#E4EAF2';this.style.transform='none';this.style.boxShadow='0 1px 2px rgba(3,31,73,.04)'">
+                        <svg class="w-6 h-6 mb-3" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24" style="color:#18A66A;" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $door['icon'] }}"/>
+                        </svg>
+                        <span class="block font-bold text-[15px] sm:text-base leading-snug" style="color:#031F49;">
+                            {{ $door['label'] }}
+                        </span>
+                        <span class="block text-xs sm:text-[13px] mt-1" style="color:#8494A8;">
+                            {{ $door['note'] }}
+                        </span>
+                    </a>
+                @endforeach
             </div>
 
-            {{-- Popular Searches --}}
-            <div class="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs text-blue-200/75 font-sans">
-                <span class="font-semibold text-secondary-300">Popular Searches:</span>
-                <a href="{{ route('jobs.index', ['keyword' => 'Warehouse Supervisor']) }}" class="px-3 py-1 rounded-full bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 transition-colors">Warehouse Supervisor</a>
-                <a href="{{ route('jobs.index', ['keyword' => 'Construction Safety Officer']) }}" class="px-3 py-1 rounded-full bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 transition-colors">Safety Officer</a>
-                <a href="{{ route('jobs.index', ['keyword' => 'Quality Engineer']) }}" class="px-3 py-1 rounded-full bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 transition-colors">Quality Engineer</a>
-                <a href="{{ route('jobs.index', ['keyword' => 'Logistics Operations']) }}" class="px-3 py-1 rounded-full bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 transition-colors">Logistics Executive</a>
-            </div>
+            {{-- Counted from the database, not written into the template. The
+                 sign-in page used to advertise 5,000 jobs against a table
+                 holding 14; whatever these say, they are true. --}}
+            <p class="text-sm" style="color:#8494A8;">
+                <strong style="color:#031F49;">{{ number_format($stats['activeJobs']) }}</strong>
+                {{ Str::plural('live vacancy', $stats['activeJobs']) }}
+                &middot;
+                <strong style="color:#031F49;">{{ number_format($stats['employers']) }}</strong>
+                verified {{ Str::plural('employer', $stats['employers']) }}
+            </p>
 
-            {{-- Animated Platform Numbers Bar with Outline Icons --}}
-            <div class="grid grid-cols-3 divide-x divide-white/10 mt-12 pt-8 border-t border-white/10 max-w-3xl mx-auto font-sans">
-                {{-- 1. Verified Jobs (Outline Briefcase) --}}
-                <div class="px-4 flex flex-col items-center justify-center text-center" x-data="counter(5240, 1800)" x-intersect.once="start()">
-                    <svg class="w-6 h-6 text-slate-300 mb-2 mx-auto" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" />
-                    </svg>
-                    <div class="text-2xl sm:text-3xl font-heading font-extrabold text-white" x-text="display">5,240+</div>
-                    <div class="text-xs text-slate-300 font-medium mt-1">Verified Jobs</div>
-                </div>
-
-                {{-- 2. Top Employers (Outline Rosette Ribbon Badge) --}}
-                <div class="px-4 flex flex-col items-center justify-center text-center" x-data="counter(1450, 1800)" x-intersect.once="start()">
-                    <svg class="w-6 h-6 text-slate-300 mb-2 mx-auto" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <circle cx="12" cy="8.5" r="5" stroke-linecap="round" stroke-linejoin="round" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 8.5l1.5 1.5 3-3" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.5 13.5L7 20.5l5-2 5 2-1.5-7" />
-                    </svg>
-                    <div class="text-2xl sm:text-3xl font-heading font-extrabold text-white" x-text="display">1,450+</div>
-                    <div class="text-xs text-slate-300 font-medium mt-1">Top Employers</div>
-                </div>
-
-                {{-- 3. Candidate Profiles (Outline 2 Users) --}}
-                <div class="px-4 flex flex-col items-center justify-center text-center" x-data="counter(45000, 2000)" x-intersect.once="start()">
-                    <svg class="w-6 h-6 text-slate-300 mb-2 mx-auto" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-                    </svg>
-                    <div class="text-2xl sm:text-3xl font-heading font-extrabold text-white" x-text="display">45,000+</div>
-                    <div class="text-xs text-slate-300 font-medium mt-1">Candidate Profiles</div>
-                </div>
-            </div>
+            <a href="#browse" class="inline-flex flex-col items-center gap-1 mt-12 text-sm font-semibold" style="color:#5A6C82;">
+                See the jobs
+                <svg class="w-5 h-5 animate-bounce" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+                </svg>
+            </a>
         </div>
     </section>
+
+    <span id="browse"></span>
 
     {{-- ═══════════════════════════════════════════════════════════
          2. EXPLORE JOBS BY CATEGORY (With Real Cover Imagery)
