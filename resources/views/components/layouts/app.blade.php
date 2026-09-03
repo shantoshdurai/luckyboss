@@ -1,3 +1,4 @@
+@props(['bare' => false])
 <?php $branding = app(\App\Services\SiteSettingsService::class)->branding(); ?>
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="bg-white">
@@ -102,8 +103,11 @@
         </div>
     @endif
 
-    {{-- Header --}}
-    <x-public-header />
+    {{-- Header. Hidden on focused pages like sign-in, where the whole site nav
+         is a distraction from the one thing the visitor came to do. --}}
+    @unless($bare)
+        <x-public-header />
+    @endunless
 
     {{-- Page Content with Smooth Animated Transition --}}
     <main class="flex-1 page-transition-wrap">
@@ -111,10 +115,14 @@
     </main>
 
     {{-- Footer --}}
-    <x-footer />
+    @unless($bare)
+        <x-footer />
+    @endunless
 
     {{-- Global AI Recruitment Copilot Drawer --}}
-    <x-ai-chat-drawer />
+    @unless($bare)
+        <x-ai-chat-drawer />
+    @endunless
 
     {{-- Instant Hover Preload & Transition Script --}}
     <script>
