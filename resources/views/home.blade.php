@@ -73,6 +73,30 @@
     }
     .lb-card:hover .lb-tile { background: #18A66A; color: #fff; transform: rotate(-6deg) scale(1.06); }
 
+    /* The photograph lifts with the card rather than sitting still inside it. */
+    .lb-shot { transition: transform .7s cubic-bezier(.22,.61,.36,1); }
+    .lb-card:hover .lb-shot { transform: scale(1.07); }
+
+    /* The scroll cue at the foot of the hero. A slow drift, not a bounce. */
+    @keyframes lb-drift { 0%,100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
+    .lb-scroll-cue svg { animation: lb-drift 2.4s ease-in-out infinite; }
+    .lb-scroll-cue:hover svg { animation-duration: 1.1s; }
+
+    /* The rolling placeholder. It swaps text at the midpoint of the fade so
+       the change is never visible as a jump. */
+    @keyframes lb-roll {
+        0%, 8%    { opacity: 0; transform: translateY(6px); }
+        18%, 82%  { opacity: 1; transform: none; }
+        92%, 100% { opacity: 0; transform: translateY(-6px); }
+    }
+    .lb-ghost {
+        position: absolute; left: 48px; top: 50%; transform: translateY(-50%);
+        pointer-events: none; font-size: 15px; color: #9AA8BA;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        max-width: calc(100% - 64px);
+    }
+    .lb-ghost span { display: inline-block; animation: lb-roll 3s ease-in-out infinite; }
+
     .lb-arrow { transition: transform .3s cubic-bezier(.22,.61,.36,1); }
     .lb-card:hover .lb-arrow { transform: translateX(5px); }
 
@@ -102,7 +126,8 @@
         .lb-enter { animation: none; }
         .js-reveal .lb-reveal { opacity: 1; transform: none; transition: none; }
         .lb-card, .lb-card::after, .lb-tile, .lb-arrow, .lb-count,
-        .lb-post .lb-spine, .lb-post h3 { transition: none; }
+        .lb-shot, .lb-post .lb-spine, .lb-post h3 { transition: none; }
+        .lb-scroll-cue svg, .lb-ghost span { animation: none; }
         .lb-card:hover { transform: none; }
     }
 </style>
@@ -156,59 +181,99 @@
         setTimeout(function () {
             document.querySelectorAll('.lb-reveal:not(.lb-in)').forEach(reveal);
         }, 3000);
+
+        // Rolling search suggestions, taken from the trades actually in the
+        // catalogue rather than a hardcoded list, so it can never advertise a
+        // sector with nothing in it.
+        var ghost = document.querySelector('[data-ghost]');
+        var input = document.querySelector('[data-rolling-placeholder]');
+
+        if (ghost && input) {
+            var terms = @json($rollingTerms ?? []);
+
+            if (terms.length) {
+                var i = 0;
+                var inner = ghost.querySelector('span');
+
+                setInterval(function () {
+                    if (input.value) return;              // never fight a typist
+                    i = (i + 1) % terms.length;
+                    inner.textContent = terms[i];
+                }, 3000);
+
+                // Restarting the animation on each swap keeps text and fade in
+                // step; without it they drift apart within a minute.
+                inner.addEventListener('animationiteration', function () {});
+            }
+
+            var hide = function () { ghost.style.display = input.value ? 'none' : ''; };
+            input.addEventListener('input', hide);
+            input.addEventListener('focus', function () { ghost.style.opacity = '.5'; });
+            input.addEventListener('blur', function () { ghost.style.opacity = ''; hide(); });
+        }
     })();
 </script>
 
     {{-- ═══════════════════════════════════════════════════════════
-         1. HERO — ASK, THEN ROUTE
+         1. HERO — ONE FULL SCREEN
 
-         Rebuilt after sir shared tickbig.com. Their homepage does not open with
-         a pitch; it asks the visitor what they came for and sends them there.
-         That is the part worth taking, and it suits us better than it suits
-         them, because Luckyboss has exactly two audiences who need completely
-         different things.
+         Reordered after Shantosh described what it should feel like: the
+         question at the top, the search in the middle of the screen, the four
+         doors beneath it, and "See the jobs" pinned to the very bottom edge so
+         it is the last thing you reach and scrolling actually goes somewhere.
 
-         What is deliberately not copied: the near-black ground, which would
-         fight a navy-and-emerald brand, and the empty stage. TickBig can afford
-         a first screen with nothing on it. A jobs site cannot — the vacancies
-         are the product, and they are what Google indexes.
-
-         What went with the old hero: a 2,000px stock photograph pulled from
-         unsplash.com on every page load. The most important page on the site
-         depended on a third party we do not control, and it was a picture of
-         nobody's warehouse.
+         The section is exactly one viewport tall for that reason. Before this
+         the cue sat halfway down with empty space under it, which made the page
+         look like it had not finished loading rather than like it was inviting
+         you to scroll.
     ═══════════════════════════════════════════════════════════════ --}}
-    <section class="relative" style="background:#F7F9FC;">
-        <div class="container mx-auto px-6 pt-16 pb-14 sm:pt-24 sm:pb-20 max-w-4xl text-center">
+    <section class="relative flex flex-col"
+             style="background:#F7F9FC; min-height:calc(100vh - 80px);">
 
-            <p class="lb-enter text-xs font-bold uppercase tracking-[0.16em] mb-5" style="color:#18A66A;">
+        <div class="container mx-auto px-6 max-w-4xl flex-1 flex flex-col justify-center text-center py-10">
+
+            <p class="lb-enter text-xs font-bold uppercase tracking-[0.16em] mb-4" style="color:#18A66A;">
                 Singapore &middot; Malaysia &middot; India
             </p>
 
-            <h1 class="lb-enter lb-d1 font-heading font-bold tracking-tight leading-[1.1] mb-4 text-[34px] sm:text-[46px] lg:text-[54px]" style="color:#031F49;">
+            <h1 class="lb-enter lb-d1 font-heading font-bold tracking-tight leading-[1.08] mb-3 text-[34px] sm:text-[48px] lg:text-[56px]"
+                style="color:#031F49;">
                 What brings you here today?
             </h1>
 
-            <p class="lb-enter lb-d2 text-base sm:text-lg mb-10 max-w-xl mx-auto" style="color:#5A6C82;">
+            <p class="lb-enter lb-d2 text-base sm:text-lg mb-9 max-w-xl mx-auto" style="color:#5A6C82;">
                 Pick one and we will take you straight to it.
             </p>
 
-            {{-- One field, not the three-part glass console this replaced.
-                 A jobs site without a search box on its front page is a worse
-                 product however clean it looks, so the capability stays; only
-                 the furniture around it went. --}}
+            {{-- The search sits at the centre of the screen because it is the
+                 thing a returning candidate came for. The placeholder cycles
+                 through real trades from our own catalogue rather than sitting
+                 static — the job seeker app does the same on its search bar,
+                 and it is what tells somebody what they are allowed to type. --}}
             <form action="{{ route('jobs.index') }}" method="GET"
-                  class="lb-enter lb-d3 flex items-stretch gap-2 max-w-xl mx-auto mb-10">
+                  class="lb-enter lb-d3 flex items-stretch gap-2 max-w-2xl mx-auto w-full mb-8">
                 <label for="keyword" class="sr-only">Search jobs</label>
-                <input id="keyword" name="keyword" type="search"
-                       value="{{ request('keyword') }}"
-                       placeholder="Job title, trade or skill"
-                       class="flex-1 rounded-xl px-4 py-3.5 text-[15px] outline-none transition-all"
-                       style="border:1px solid #E4EAF2;background:#fff;color:#031F49;"
-                       onfocus="this.style.borderColor='#18A66A';this.style.boxShadow='0 0 0 3px rgba(24,166,106,.14)'"
-                       onblur="this.style.borderColor='#E4EAF2';this.style.boxShadow='none'">
-                <button type="submit"
-                        class="rounded-xl px-6 font-bold text-[15px] transition-all"
+                <div class="relative flex-1">
+                    <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
+                         fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" style="color:#9AA8BA;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
+                    </svg>
+                    <input id="keyword" name="keyword" type="search" autocomplete="off"
+                           value="{{ request('keyword') }}"
+                           data-rolling-placeholder
+                           placeholder=""
+                           class="w-full rounded-2xl pl-12 pr-4 py-4 text-[15px] outline-none transition-all"
+                           style="border:1px solid #E4EAF2;background:#fff;color:#031F49;"
+                           onfocus="this.style.borderColor='#18A66A';this.style.boxShadow='0 0 0 3px rgba(24,166,106,.14)'"
+                           onblur="this.style.borderColor='#E4EAF2';this.style.boxShadow='none'">
+                    {{-- A real element rather than the placeholder attribute:
+                         a placeholder cannot be animated, and swapping its text
+                         on a timer reads as a glitch. This fades out, changes,
+                         and fades back in, and it disappears the moment anyone
+                         types. --}}
+                    <span class="lb-ghost" data-ghost aria-hidden="true"><span>Warehouse Supervisor</span></span>
+                </div>
+                <button type="submit" class="rounded-2xl px-7 font-bold text-[15px] transition-all"
                         style="background:#031F49;color:#fff;"
                         onmouseover="this.style.background='#052a63'"
                         onmouseout="this.style.background='#031F49'">
@@ -216,42 +281,39 @@
                 </button>
             </form>
 
-            {{-- The four real doors into the product. Every one goes to a page
-                 that exists; nothing here is a placeholder. --}}
             @php
                 $doors = [
                     [
                         'label' => 'Find a job',
-                        'note' => $stats['activeJobs'] . ' open now',
-                        'href' => route('jobs.index'),
-                        'icon' => 'M20.25 14.15v4.073a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a12.06 12.06 0 0 1-6.596 0l-1.32-.377a2.25 2.25 0 0 1-1.632-2.163V14.15M3.75 8.25v10.5a2.25 2.25 0 0 0 2.25 2.25h12a2.25 2.25 0 0 0 2.25-2.25V8.25M3.75 8.25h16.5M9 5.25V4.5A1.5 1.5 0 0 1 10.5 3h3a1.5 1.5 0 0 1 1.5 1.5v.75',
+                        'note'  => $stats['activeJobs'] . ' open now',
+                        'href'  => route('jobs.index'),
+                        'icon'  => 'M20.25 14.15v4.073a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a12.06 12.06 0 0 1-6.596 0l-1.32-.377a2.25 2.25 0 0 1-1.632-2.163V14.15M3.75 8.25v10.5a2.25 2.25 0 0 0 2.25 2.25h12a2.25 2.25 0 0 0 2.25-2.25V8.25M3.75 8.25h16.5M9 5.25V4.5A1.5 1.5 0 0 1 10.5 3h3a1.5 1.5 0 0 1 1.5 1.5v.75',
                     ],
                     [
                         'label' => 'Hire workers',
-                        'note' => 'Post a vacancy',
-                        'href' => route('register.employer'),
-                        'icon' => 'M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
+                        'note'  => 'Post a vacancy',
+                        'href'  => route('register.employer'),
+                        'icon'  => 'M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
                     ],
                     [
                         'label' => 'Browse by trade',
-                        'note' => 'Construction, driving, care',
-                        'href' => route('categories.index'),
-                        'icon' => 'M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085',
+                        'note'  => 'Construction, driving, care',
+                        'href'  => route('categories.index'),
+                        'icon'  => 'M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085',
                     ],
                     [
                         'label' => 'I have an account',
-                        'note' => 'Sign in',
-                        'href' => route('login'),
-                        'icon' => 'M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25',
+                        'note'  => 'Sign in',
+                        'href'  => route('login'),
+                        'icon'  => 'M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25',
                     ],
                 ];
             @endphp
 
-            <div class="lb-enter lb-d4 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-10">
+            <div class="lb-enter lb-d4 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-7">
                 @foreach($doors as $door)
-                    <a href="{{ $door['href'] }}"
-                       class="lb-card px-4 py-6 sm:py-7 text-left">
-                        <span class="lb-tile mb-4">
+                    <a href="{{ $door['href'] }}" class="lb-card px-4 py-5 sm:py-6 text-left">
+                        <span class="lb-tile mb-3.5">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="{{ $door['icon'] }}"/>
                             </svg>
@@ -266,20 +328,24 @@
                 @endforeach
             </div>
 
-            {{-- Counted from the database, not written into the template. The
-                 sign-in page used to advertise 5,000 jobs against a table
-                 holding 14; whatever these say, they are true. --}}
-            <p class="text-sm" style="color:#8494A8;">
+            {{-- Counted from the database. The sign-in page used to advertise
+                 5,000 jobs against a table holding 14. --}}
+            <p class="lb-enter lb-d4 text-sm" style="color:#8494A8;">
                 <strong style="color:#031F49;">{{ number_format($stats['activeJobs']) }}</strong>
                 {{ Str::plural('live vacancy', $stats['activeJobs']) }}
                 &middot;
                 <strong style="color:#031F49;">{{ number_format($stats['employers']) }}</strong>
                 verified {{ Str::plural('employer', $stats['employers']) }}
             </p>
+        </div>
 
-            <a href="#browse" class="inline-flex flex-col items-center gap-1 mt-12 text-sm font-semibold" style="color:#5A6C82;">
+        {{-- Pinned to the bottom edge of the screen, so it is the last thing
+             you reach and scrolling from it lands on the next full section. --}}
+        <div class="pb-8 text-center">
+            <a href="#browse" class="lb-scroll-cue inline-flex flex-col items-center gap-1 text-sm font-semibold"
+               style="color:#5A6C82;">
                 See the jobs
-                <svg class="w-5 h-5 animate-bounce" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
                 </svg>
             </a>
@@ -305,8 +371,27 @@
             </div>
 
             @php
-                // Trade marks, drawn. Replaced a map of ten Unsplash URLs;
-                // see the card below for why.
+                // A photograph per trade, and an icon behind it. The picture
+                // does the explaining for candidates who do not read long
+                // English comfortably; the icon is what survives if the picture
+                // never arrives.
+                $categoryImages = [
+                    'construction'  => 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=600&q=80',
+                    'manufacturing' => 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80',
+                    'warehouse'     => 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80',
+                    'healthcare'    => 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=600&q=80',
+                    'health'        => 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=600&q=80',
+                    'logistics'     => 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=600&q=80',
+                    'driving'       => 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=600&q=80',
+                    'hospitality'   => 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80',
+                    'domestic'      => 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80',
+                    'engineering'   => 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
+                    'engineer'      => 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
+                    'sales'         => 'https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=600&q=80',
+                ];
+
+                $defaultImage = 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=600&q=80';
+
                 $categoryIcons = [
                     'construction'  => 'M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085',
                     'manufacturing' => 'M42 42M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21',
@@ -333,45 +418,65 @@
                     @php 
                         $slug = Str::slug($category->name);
                         $matchedIcon = $defaultIcon;
+                        $matchedImage = $defaultImage;
                         foreach($categoryIcons as $key => $ic) {
                             if(Str::contains($slug, $key) || Str::contains(strtolower($category->name), $key)) {
                                 $matchedIcon = $ic;
+                                $matchedImage = $categoryImages[$key] ?? $defaultImage;
                                 break;
                             }
                         }
                         $jobCount = $category->jobs_count ?? ($category->jobs ? $category->jobs->count() : 0);
                     @endphp
                     <a href="{{ route('jobs.index', ['category' => $category->id]) }}"
-                       class="lb-card lb-reveal group flex flex-col p-6">
+                       class="lb-card lb-reveal group flex flex-col overflow-hidden">
 
-                        {{-- Icon and count on one line. The previous version put
-                             a 112px tinted band above the text with a small icon
-                             floating in it, which read as a picture that had
-                             failed to load rather than as a design. --}}
-                        <div class="flex items-start justify-between mb-5">
-                            <span class="lb-tile">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6"
-                                     viewBox="0 0 24 24" aria-hidden="true">
+                        {{-- The photograph is back.
+
+                             It was removed to kill ten external requests, and
+                             that traded the wrong thing away: many of the
+                             candidates this platform is built for do not read
+                             long English comfortably, and a picture of a
+                             warehouse tells them what the card is faster than
+                             the word "Warehouse" does. Sir asked for images and
+                             he was right.
+
+                             What stays fixed is the failure case: every image
+                             is lazy-loaded, and if it does not arrive the tinted
+                             ground and the trade icon underneath still read as
+                             a finished card rather than a hole. --}}
+                        <div class="relative overflow-hidden" style="height:150px;background:linear-gradient(135deg,#EAF1FA 0%,#E7F5EE 100%);">
+                            <img src="{{ $matchedImage }}" alt="{{ $category->name }}" loading="lazy"
+                                 class="lb-shot w-full h-full object-cover"
+                                 onerror="this.style.display='none'">
+
+                            <span class="lb-tile" style="position:absolute;left:14px;bottom:14px;background:rgba(255,255,255,.94);backdrop-filter:blur(6px);">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="{{ $matchedIcon }}"/>
                                 </svg>
                             </span>
-                            <span class="lb-count">{{ number_format($jobCount) }} {{ Str::plural('job', $jobCount) }}</span>
+
+                            <span class="lb-count" style="position:absolute;right:14px;top:14px;background:rgba(255,255,255,.94);">
+                                {{ number_format($jobCount) }} {{ Str::plural('job', $jobCount) }}
+                            </span>
                         </div>
 
-                        <h3 class="font-heading font-bold text-lg mb-1.5" style="color:#031F49;">
-                            {{ $category->name }}
-                        </h3>
+                        <div class="p-5 flex flex-col flex-1">
+                            <h3 class="font-heading font-bold text-lg mb-1.5" style="color:#031F49;">
+                                {{ $category->name }}
+                            </h3>
 
-                        <p class="text-[13px] leading-relaxed mb-5 flex-1" style="color:#7A8AA0;">
-                            {{ $category->description ?? 'Verified openings from employers hiring across Singapore, Malaysia and India.' }}
-                        </p>
+                            <p class="text-[13px] leading-relaxed mb-4 flex-1" style="color:#7A8AA0;">
+                                {{ $category->description ?? 'Verified openings from employers hiring across Singapore, Malaysia and India.' }}
+                            </p>
 
-                        <span class="inline-flex items-center gap-1.5 text-[13px] font-bold" style="color:#18A66A;">
-                            Browse roles
-                            <svg class="lb-arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
-                            </svg>
-                        </span>
+                            <span class="inline-flex items-center gap-1.5 text-[13px] font-bold" style="color:#18A66A;">
+                                Browse roles
+                                <svg class="lb-arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
+                                </svg>
+                            </span>
+                        </div>
                     </a>
                 @empty
                     <div class="col-span-full text-center py-12 text-text-muted">

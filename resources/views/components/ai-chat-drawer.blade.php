@@ -35,7 +35,17 @@
         x-transition:leave="transition ease-in duration-150"
         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
         x-transition:leave-end="opacity-0 translate-y-6 scale-95"
-        class="fixed bottom-22 right-4 sm:right-6 w-[calc(100vw-2rem)] sm:w-[380px] h-[520px] max-h-[75vh] bg-white rounded-3xl shadow-2xl border border-border/80 flex flex-col z-50 overflow-hidden"
+        {{-- Positioned with real CSS, not utilities.
+
+             This carried `bottom-22`, `w-[calc(100vw-2rem)]` and
+             `sm:w-[380px]` — none of which exist in the prebuilt Tailwind
+             bundle this project ships, because arbitrary values and that
+             spacing step are generated at build time and there is no build
+             step. With no width rule surviving, the panel stretched the full
+             width of the window and sat across the bottom of the page like a
+             banner instead of beside it like every other assistant. --}}
+        class="bg-white flex flex-col overflow-hidden"
+        style="position:fixed; right:24px; bottom:92px; width:min(380px, calc(100vw - 32px)); height:min(540px, 72vh); z-index:50; border:1px solid #E4EAF2; border-radius:20px; box-shadow:0 24px 60px -20px rgba(3,31,73,.45);"
         style="display: none;"
     >
         {{-- Popup Header --}}
