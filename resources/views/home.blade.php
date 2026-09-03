@@ -146,21 +146,26 @@
             </div>
 
             @php
-                $categoryImages = [
-                    'construction' => 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=600&q=80',
-                    'manufacturing' => 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80',
-                    'warehouse' => 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80',
-                    'healthcare' => 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=600&q=80',
-                    'health' => 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=600&q=80',
-                    'logistics' => 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=600&q=80',
-                    'hospitality' => 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80',
-                    'domestic' => 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80',
-                    'engineering' => 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
-                    'engineer' => 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
-                    'sales' => 'https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=600&q=80',
-                    'admin' => 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=600&q=80',
-                    'security' => 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=600&q=80',
+                // Trade marks, drawn. Replaced a map of ten Unsplash URLs;
+                // see the card below for why.
+                $categoryIcons = [
+                    'construction'  => 'M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085',
+                    'manufacturing' => 'M42 42M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21',
+                    'warehouse'     => 'M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z',
+                    'healthcare'    => 'M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z',
+                    'health'        => 'M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z',
+                    'logistics'     => 'M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12',
+                    'driving'       => 'M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25',
+                    'hospitality'   => 'M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12.75 6.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z',
+                    'domestic'      => 'M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75',
+                    'engineering'   => 'M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63',
+                    'engineer'      => 'M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63',
+                    'sales'         => 'M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
                 ];
+
+                // A trade with no mark of its own gets a generic one rather
+                // than a broken image.
+                $defaultIcon = 'M20.25 14.15v4.073a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a12.06 12.06 0 0 1-6.596 0l-1.32-.377a2.25 2.25 0 0 1-1.632-2.163V14.15M3.75 8.25v10.5a2.25 2.25 0 0 0 2.25 2.25h12a2.25 2.25 0 0 0 2.25-2.25V8.25M3.75 8.25h16.5M9 5.25V4.5A1.5 1.5 0 0 1 10.5 3h3a1.5 1.5 0 0 1 1.5 1.5v.75';
             @endphp
 
             {{-- Category Grid --}}
@@ -168,10 +173,10 @@
                 @forelse($categories as $category)
                     @php 
                         $slug = Str::slug($category->name);
-                        $matchedImage = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80';
-                        foreach($categoryImages as $key => $img) {
+                        $matchedIcon = $defaultIcon;
+                        foreach($categoryIcons as $key => $ic) {
                             if(Str::contains($slug, $key) || Str::contains(strtolower($category->name), $key)) {
-                                $matchedImage = $img;
+                                $matchedIcon = $ic;
                                 break;
                             }
                         }
@@ -180,15 +185,31 @@
                     <a href="{{ route('jobs.index', ['category' => $category->id]) }}" 
                        class="group bg-white rounded-2xl overflow-hidden border border-border hover:border-accent shadow-xs hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between">
                         <div>
-                            {{-- Cover Image --}}
-                            <div class="h-40 w-full relative overflow-hidden bg-surface-sunken">
-                                <img src="{{ $matchedImage }}" alt="{{ $category->name }}" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out" loading="lazy">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
-                                <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-white/20 backdrop-blur-md border border-white/30 text-white">
-                                        {{ number_format($jobCount) }} Jobs Available
-                                    </span>
-                                </div>
+                            {{-- A drawn mark, not a photograph.
+
+                                 Each of these cards used to load a 600px stock
+                                 photo from unsplash.com — ten external requests
+                                 on the front page, of nobody's warehouse and
+                                 nobody's building site. For candidates on a
+                                 field worker's connection that is the slowest
+                                 part of the page, and if Unsplash is blocked or
+                                 slow the homepage looks broken.
+
+                                 An icon in the brand's own colours always
+                                 loads, weighs nothing, and is honest: a drawing
+                                 does not pretend to be a photograph of our
+                                 sites. When we have real photographs of real
+                                 placements, those should replace these. --}}
+                            <div class="h-28 w-full relative flex items-end px-5 pb-4"
+                                 style="background:linear-gradient(135deg,#F2F7FF 0%,#EAF6F0 100%);border-bottom:1px solid #E4EAF2;">
+                                <svg class="w-9 h-9 absolute top-4 left-5" fill="none" stroke="currentColor"
+                                     stroke-width="1.5" viewBox="0 0 24 24" style="color:#18A66A;" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $matchedIcon }}"/>
+                                </svg>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold"
+                                      style="background:#FFFFFF;border:1px solid #E4EAF2;color:#031F49;">
+                                    {{ number_format($jobCount) }} {{ Str::plural('job', $jobCount) }}
+                                </span>
                             </div>
 
                             {{-- Category Title & Description --}}
@@ -543,19 +564,29 @@
             </div>
 
             @php
-                $editorialImages = [
-                    'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=800&auto=format&fit=crop&q=80',
-                    'https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=800&auto=format&fit=crop&q=80',
-                    'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&auto=format&fit=crop&q=80',
-                ];
+                // Was three Unsplash photographs cycled by loop index, used
+                // for every article whether or not it had its own image — the
+                // blogs.image column was never read. A post with a real
+                // picture now shows it; one without gets a lettered tile
+                // instead of a stock photo of somebody else's office.
+                $editorialFallback = null;
             @endphp
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 @foreach($blogs as $blog)
-                    @php $imgUrl = $editorialImages[$loop->index % count($editorialImages)]; @endphp
                     <article class="bg-white rounded-2xl overflow-hidden border border-border shadow-xs hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group flex flex-col h-full">
                         <a href="{{ route('blogs.show', $blog->slug) }}" class="block aspect-[16/10] bg-surface-sunken relative overflow-hidden">
-                            <img src="{{ $imgUrl }}" alt="{{ $blog->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">
+                            @if($blog->image)
+                                <img src="{{ asset($blog->image) }}" alt="{{ $blog->title }}"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center"
+                                     style="background:linear-gradient(135deg,#F2F7FF 0%,#EAF6F0 100%);">
+                                    <span class="font-heading font-bold text-4xl" style="color:#18A66A;opacity:.55;">
+                                        {{ Str::upper(Str::substr($blog->category ?? $blog->title, 0, 1)) }}
+                                    </span>
+                                </div>
+                            @endif
                             <div class="absolute top-4 left-4">
                                 <span class="bg-white/95 backdrop-blur-md text-navy px-3 py-1 rounded-full text-xs font-bold shadow-xs">
                                     {{ $blog->category ?? 'Career' }}
