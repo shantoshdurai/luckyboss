@@ -1,4 +1,164 @@
 <x-layouts.app title="Luckyboss Employment Agency Pte. Ltd | AI-Powered Recruitment Platform">
+{{-- Motion and card craft for the front page.
+
+     Written as plain CSS rather than utility classes: this project ships a
+     prebuilt Tailwind bundle with no Node step, so a class invented here would
+     simply not exist at runtime. Everything below is therefore self-contained.
+
+     The reveal uses IntersectionObserver directly instead of the Alpine plugin,
+     so a section can never end up permanently invisible because a plugin failed
+     to load — without JS at all, `.lb-reveal` is already in its final state and
+     the page just appears with no animation. --}}
+<style>
+    @keyframes lb-rise {
+        from { opacity: 0; transform: translateY(18px); }
+        to   { opacity: 1; transform: none; }
+    }
+
+    /* Hero: a short staged entrance, not a carnival. */
+    .lb-enter { animation: lb-rise .6s cubic-bezier(.22,.61,.36,1) both; }
+    .lb-d1 { animation-delay: .05s; }
+    .lb-d2 { animation-delay: .13s; }
+    .lb-d3 { animation-delay: .21s; }
+    .lb-d4 { animation-delay: .29s; }
+
+    /* Scroll reveal. Visible by default; JS hides then releases it, so the
+       content is never lost when scripting is off or an observer fails. */
+    .js-reveal .lb-reveal { opacity: 0; transform: translateY(22px); }
+    .js-reveal .lb-reveal.lb-in {
+        opacity: 1; transform: none;
+        transition: opacity .65s cubic-bezier(.22,.61,.36,1),
+                    transform .65s cubic-bezier(.22,.61,.36,1);
+    }
+    .js-reveal .lb-reveal:nth-child(2) { transition-delay: .06s; }
+    .js-reveal .lb-reveal:nth-child(3) { transition-delay: .12s; }
+    .js-reveal .lb-reveal:nth-child(4) { transition-delay: .18s; }
+    .js-reveal .lb-reveal:nth-child(5) { transition-delay: .24s; }
+    .js-reveal .lb-reveal:nth-child(6) { transition-delay: .30s; }
+    .js-reveal .lb-reveal:nth-child(7) { transition-delay: .36s; }
+    .js-reveal .lb-reveal:nth-child(8) { transition-delay: .42s; }
+
+    /* One hover language for every card on the page. */
+    .lb-card {
+        position: relative;
+        background: #fff;
+        border: 1px solid #E4EAF2;
+        border-radius: 18px;
+        transition: transform .3s cubic-bezier(.22,.61,.36,1),
+                    box-shadow .3s cubic-bezier(.22,.61,.36,1),
+                    border-color .3s ease;
+    }
+    .lb-card:hover {
+        transform: translateY(-4px);
+        border-color: #C9E6D8;
+        box-shadow: 0 18px 40px -24px rgba(3,31,73,.45);
+    }
+
+    /* The accent hairline that draws itself across the top on hover. */
+    .lb-card::after {
+        content: ""; position: absolute; left: 18px; right: 18px; top: -1px;
+        height: 2px; border-radius: 2px;
+        background: linear-gradient(90deg, #18A66A, #2563EB);
+        transform: scaleX(0); transform-origin: left;
+        transition: transform .45s cubic-bezier(.22,.61,.36,1);
+    }
+    .lb-card:hover::after { transform: scaleX(1); }
+
+    /* The icon tile. Colour deepens rather than the whole card lighting up. */
+    .lb-tile {
+        width: 46px; height: 46px; border-radius: 13px;
+        display: flex; align-items: center; justify-content: center;
+        background: #EAF6F0; color: #18A66A;
+        transition: background .3s ease, color .3s ease, transform .35s cubic-bezier(.34,1.56,.64,1);
+    }
+    .lb-card:hover .lb-tile { background: #18A66A; color: #fff; transform: rotate(-6deg) scale(1.06); }
+
+    .lb-arrow { transition: transform .3s cubic-bezier(.22,.61,.36,1); }
+    .lb-card:hover .lb-arrow { transform: translateX(5px); }
+
+    .lb-count {
+        font-size: 11px; font-weight: 700; letter-spacing: .04em;
+        padding: 3px 9px; border-radius: 999px;
+        background: #F2F7FF; color: #2563EB; border: 1px solid #E1ECFB;
+        transition: background .3s ease, color .3s ease, border-color .3s ease;
+    }
+    .lb-card:hover .lb-count { background: #031F49; color: #fff; border-color: #031F49; }
+
+    /* Editorial cards. Text-led on purpose — a coloured spine reads as a
+       decision, where a placeholder image reads as a missing one. */
+    .lb-post { overflow: hidden; }
+    .lb-post .lb-spine {
+        height: 4px; width: 100%;
+        background: linear-gradient(90deg, #18A66A 0%, #2563EB 100%);
+        transform: scaleX(.28); transform-origin: left;
+        transition: transform .5s cubic-bezier(.22,.61,.36,1);
+    }
+    .lb-post:hover .lb-spine { transform: scaleX(1); }
+    .lb-post h3 { transition: color .25s ease; }
+    .lb-post:hover h3 { color: #18A66A; }
+
+    /* Anyone who has asked their system to calm down gets no motion at all. */
+    @media (prefers-reduced-motion: reduce) {
+        .lb-enter { animation: none; }
+        .js-reveal .lb-reveal { opacity: 1; transform: none; transition: none; }
+        .lb-card, .lb-card::after, .lb-tile, .lb-arrow, .lb-count,
+        .lb-post .lb-spine, .lb-post h3 { transition: none; }
+        .lb-card:hover { transform: none; }
+    }
+</style>
+
+<script>
+    // Marking the document here rather than in the stylesheet is what makes the
+    // no-JS case safe: until this runs, .lb-reveal has no hidden state at all.
+    document.documentElement.classList.add('js-reveal');
+
+    (function () {
+        var started = false;
+
+        function reveal(el) { el.classList.add('lb-in'); }
+
+        function start() {
+            if (started) return;
+            started = true;
+
+            var items = document.querySelectorAll('.lb-reveal');
+
+            if (!('IntersectionObserver' in window)) {
+                items.forEach(reveal);
+                return;
+            }
+
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (!entry.isIntersecting) return;
+                    reveal(entry.target);
+                    io.unobserve(entry.target);
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+            items.forEach(function (el) { io.observe(el); });
+        }
+
+        // Three ways in, because one was not enough. The first attempt hung
+        // this listener on DOMContentLoaded alone; something else on the page
+        // meant it never ran, and every card below the fold stayed at opacity
+        // zero — content invisible, which is far worse than content that simply
+        // does not animate.
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', start);
+        } else {
+            start();
+        }
+        window.addEventListener('load', start);
+
+        // The guarantee. Whatever happens above, nothing stays hidden: after
+        // three seconds everything is shown regardless.
+        setTimeout(function () {
+            document.querySelectorAll('.lb-reveal:not(.lb-in)').forEach(reveal);
+        }, 3000);
+    })();
+</script>
+
     {{-- ═══════════════════════════════════════════════════════════
          1. HERO — ASK, THEN ROUTE
 
@@ -21,15 +181,15 @@
     <section class="relative" style="background:#F7F9FC;">
         <div class="container mx-auto px-6 pt-16 pb-14 sm:pt-24 sm:pb-20 max-w-4xl text-center">
 
-            <p class="text-xs font-bold uppercase tracking-[0.16em] mb-5" style="color:#18A66A;">
+            <p class="lb-enter text-xs font-bold uppercase tracking-[0.16em] mb-5" style="color:#18A66A;">
                 Singapore &middot; Malaysia &middot; India
             </p>
 
-            <h1 class="font-heading font-bold tracking-tight leading-[1.1] mb-4 text-[34px] sm:text-[46px] lg:text-[54px]" style="color:#031F49;">
+            <h1 class="lb-enter lb-d1 font-heading font-bold tracking-tight leading-[1.1] mb-4 text-[34px] sm:text-[46px] lg:text-[54px]" style="color:#031F49;">
                 What brings you here today?
             </h1>
 
-            <p class="text-base sm:text-lg mb-10 max-w-xl mx-auto" style="color:#5A6C82;">
+            <p class="lb-enter lb-d2 text-base sm:text-lg mb-10 max-w-xl mx-auto" style="color:#5A6C82;">
                 Pick one and we will take you straight to it.
             </p>
 
@@ -38,7 +198,7 @@
                  product however clean it looks, so the capability stays; only
                  the furniture around it went. --}}
             <form action="{{ route('jobs.index') }}" method="GET"
-                  class="flex items-stretch gap-2 max-w-xl mx-auto mb-10">
+                  class="lb-enter lb-d3 flex items-stretch gap-2 max-w-xl mx-auto mb-10">
                 <label for="keyword" class="sr-only">Search jobs</label>
                 <input id="keyword" name="keyword" type="search"
                        value="{{ request('keyword') }}"
@@ -87,16 +247,15 @@
                 ];
             @endphp
 
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-10">
+            <div class="lb-enter lb-d4 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-10">
                 @foreach($doors as $door)
                     <a href="{{ $door['href'] }}"
-                       class="group rounded-2xl px-4 py-6 sm:py-7 text-left transition-all"
-                       style="background:#FFFFFF;border:1px solid #E4EAF2;box-shadow:0 1px 2px rgba(3,31,73,.04);"
-                       onmouseover="this.style.borderColor='#18A66A';this.style.transform='translateY(-2px)';this.style.boxShadow='0 12px 28px -18px rgba(3,31,73,.4)'"
-                       onmouseout="this.style.borderColor='#E4EAF2';this.style.transform='none';this.style.boxShadow='0 1px 2px rgba(3,31,73,.04)'">
-                        <svg class="w-6 h-6 mb-3" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24" style="color:#18A66A;" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $door['icon'] }}"/>
-                        </svg>
+                       class="lb-card px-4 py-6 sm:py-7 text-left">
+                        <span class="lb-tile mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="{{ $door['icon'] }}"/>
+                            </svg>
+                        </span>
                         <span class="block font-bold text-[15px] sm:text-base leading-snug" style="color:#031F49;">
                             {{ $door['label'] }}
                         </span>
@@ -182,54 +341,37 @@
                         }
                         $jobCount = $category->jobs_count ?? ($category->jobs ? $category->jobs->count() : 0);
                     @endphp
-                    <a href="{{ route('jobs.index', ['category' => $category->id]) }}" 
-                       class="group bg-white rounded-2xl overflow-hidden border border-border hover:border-accent shadow-xs hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between">
-                        <div>
-                            {{-- A drawn mark, not a photograph.
+                    <a href="{{ route('jobs.index', ['category' => $category->id]) }}"
+                       class="lb-card lb-reveal group flex flex-col p-6">
 
-                                 Each of these cards used to load a 600px stock
-                                 photo from unsplash.com — ten external requests
-                                 on the front page, of nobody's warehouse and
-                                 nobody's building site. For candidates on a
-                                 field worker's connection that is the slowest
-                                 part of the page, and if Unsplash is blocked or
-                                 slow the homepage looks broken.
-
-                                 An icon in the brand's own colours always
-                                 loads, weighs nothing, and is honest: a drawing
-                                 does not pretend to be a photograph of our
-                                 sites. When we have real photographs of real
-                                 placements, those should replace these. --}}
-                            <div class="h-28 w-full relative flex items-end px-5 pb-4"
-                                 style="background:linear-gradient(135deg,#F2F7FF 0%,#EAF6F0 100%);border-bottom:1px solid #E4EAF2;">
-                                <svg class="w-9 h-9 absolute top-4 left-5" fill="none" stroke="currentColor"
-                                     stroke-width="1.5" viewBox="0 0 24 24" style="color:#18A66A;" aria-hidden="true">
+                        {{-- Icon and count on one line. The previous version put
+                             a 112px tinted band above the text with a small icon
+                             floating in it, which read as a picture that had
+                             failed to load rather than as a design. --}}
+                        <div class="flex items-start justify-between mb-5">
+                            <span class="lb-tile">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6"
+                                     viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="{{ $matchedIcon }}"/>
                                 </svg>
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold"
-                                      style="background:#FFFFFF;border:1px solid #E4EAF2;color:#031F49;">
-                                    {{ number_format($jobCount) }} {{ Str::plural('job', $jobCount) }}
-                                </span>
-                            </div>
-
-                            {{-- Category Title & Description --}}
-                            <div class="p-5">
-                                <h3 class="font-heading font-bold text-lg text-navy mb-1 group-hover:text-accent transition-colors">
-                                    {{ $category->name }}
-                                </h3>
-                                <p class="text-xs text-text-muted leading-relaxed line-clamp-2">
-                                    {{ $category->description ?? 'Explore verified employment openings and competitive salaries.' }}
-                                </p>
-                            </div>
+                            </span>
+                            <span class="lb-count">{{ number_format($jobCount) }} {{ Str::plural('job', $jobCount) }}</span>
                         </div>
 
-                        {{-- Footer Link --}}
-                        <div class="px-5 pb-4 pt-0 flex items-center justify-between text-xs font-bold text-accent group-hover:text-navy transition-colors">
-                            <span>Browse Roles</span>
-                            <div class="w-6 h-6 rounded-full bg-blue-50 group-hover:bg-accent group-hover:text-white flex items-center justify-center transition-colors">
-                                <svg class="w-3 h-3 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                            </div>
-                        </div>
+                        <h3 class="font-heading font-bold text-lg mb-1.5" style="color:#031F49;">
+                            {{ $category->name }}
+                        </h3>
+
+                        <p class="text-[13px] leading-relaxed mb-5 flex-1" style="color:#7A8AA0;">
+                            {{ $category->description ?? 'Verified openings from employers hiring across Singapore, Malaysia and India.' }}
+                        </p>
+
+                        <span class="inline-flex items-center gap-1.5 text-[13px] font-bold" style="color:#18A66A;">
+                            Browse roles
+                            <svg class="lb-arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
+                            </svg>
+                        </span>
                     </a>
                 @empty
                     <div class="col-span-full text-center py-12 text-text-muted">
@@ -574,41 +716,51 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 @foreach($blogs as $blog)
-                    <article class="bg-white rounded-2xl overflow-hidden border border-border shadow-xs hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group flex flex-col h-full">
-                        <a href="{{ route('blogs.show', $blog->slug) }}" class="block aspect-[16/10] bg-surface-sunken relative overflow-hidden">
-                            @if($blog->image)
+                    <article class="lb-card lb-post lb-reveal flex flex-col h-full">
+                        {{-- A coloured spine that draws across on hover.
+
+                             This replaced a 16:10 panel holding a single large
+                             letter when a post had no picture — which looked
+                             exactly like an image that had failed to load. An
+                             article does not need a photograph to be worth
+                             reading; it needs a headline you can see. So the
+                             card is text-led, and a post that does have its own
+                             image still shows it. --}}
+                        <div class="lb-spine"></div>
+
+                        @if($blog->image)
+                            <a href="{{ route('blogs.show', $blog->slug) }}" class="block aspect-[16/9] overflow-hidden">
                                 <img src="{{ asset($blog->image) }}" alt="{{ $blog->title }}"
-                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center"
-                                     style="background:linear-gradient(135deg,#F2F7FF 0%,#EAF6F0 100%);">
-                                    <span class="font-heading font-bold text-4xl" style="color:#18A66A;opacity:.55;">
-                                        {{ Str::upper(Str::substr($blog->category ?? $blog->title, 0, 1)) }}
-                                    </span>
-                                </div>
-                            @endif
-                            <div class="absolute top-4 left-4">
-                                <span class="bg-white/95 backdrop-blur-md text-navy px-3 py-1 rounded-full text-xs font-bold shadow-xs">
+                                     class="w-full h-full object-cover" loading="lazy">
+                            </a>
+                        @endif
+
+                        <div class="p-6 flex-1 flex flex-col">
+                            <div class="flex items-center gap-2.5 mb-3">
+                                <span class="text-[10px] font-bold uppercase tracking-[0.12em] px-2.5 py-1 rounded-full"
+                                      style="background:#EAF6F0;color:#127A50;">
                                     {{ $blog->category ?? 'Career' }}
                                 </span>
+                                <span class="text-[11px]" style="color:#9AA8BA;">
+                                    {{ $blog->published_at ? $blog->published_at->format('j M Y') : now()->format('j M Y') }}
+                                </span>
                             </div>
-                        </a>
-                        <div class="p-6 flex-1 flex flex-col justify-between">
-                            <div>
-                                <div class="text-xs text-text-muted mb-2.5 flex items-center gap-2">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                    {{ $blog->published_at ? $blog->published_at->format('M d, Y') : now()->format('M d, Y') }}
-                                </div>
-                                <h3 class="text-lg font-heading font-bold text-navy mb-2 group-hover:text-accent transition-colors leading-snug">
-                                    <a href="{{ route('blogs.show', $blog->slug) }}">{{ $blog->title }}</a>
-                                </h3>
-                                <p class="text-text-secondary text-xs mb-5 line-clamp-3 leading-relaxed">
-                                    {{ $blog->short_description ?? Str::limit(strip_tags($blog->content), 120) }}
-                                </p>
-                            </div>
-                            <a href="{{ route('blogs.show', $blog->slug) }}" class="inline-flex items-center text-accent font-bold text-xs hover:text-navy group/link pt-3 border-t border-border">
-                                <span>Read Full Guide</span> 
-                                <svg class="w-3.5 h-3.5 ml-1.5 group-hover/link:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+
+                            <h3 class="text-[19px] font-heading font-bold mb-2.5 leading-snug" style="color:#031F49;">
+                                <a href="{{ route('blogs.show', $blog->slug) }}">{{ $blog->title }}</a>
+                            </h3>
+
+                            <p class="text-[13px] leading-relaxed mb-6 flex-1" style="color:#7A8AA0;">
+                                {{ $blog->short_description ?? Str::limit(strip_tags($blog->content), 130) }}
+                            </p>
+
+                            <a href="{{ route('blogs.show', $blog->slug) }}"
+                               class="inline-flex items-center gap-1.5 text-[13px] font-bold pt-4"
+                               style="color:#18A66A;border-top:1px solid #EEF2F7;">
+                                Read the guide
+                                <svg class="lb-arrow w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
+                                </svg>
                             </a>
                         </div>
                     </article>
