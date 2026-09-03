@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\AiUsage;
 use App\Models\Company;
 use App\Models\FeatureFlag;
 
@@ -54,6 +55,21 @@ class EmployerAiGate
         }
 
         if ($this->entitlements->allows($company, $feature)) {
+            // Spec §33 lists AI Usage as a package setting alongside the job
+            // and candidate limits. Without it a single heavy employer can
+            // spend more of our Gemini budget in a month than their whole
+            // subscription brings in, and nobody finds out until the bill.
+            $limit = $this->usageLimit($company);
+
+            if ($limit !== null && $this->usedThisMonth($company) >= $limit) {
+                return $this->deny(
+                    'You have used all '.$limit.' AI actions included in your plan this month. '
+                    .'They reset at the start of next month, or you can upgrade for more.',
+                    // Genuinely an upgrade question, unlike the admin switch.
+                    upgrade: true
+                );
+            }
+
             return ['allowed' => true, 'source' => 'platform', 'reason' => null, 'upgrade_required' => false];
         }
 
@@ -67,6 +83,62 @@ class EmployerAiGate
             'Your current plan does not include AI tools. Upgrade your subscription to switch them on.',
             upgrade: true
         );
+    }
+
+    /**
+     * Records one AI action against the company's monthly allowance.
+     *
+     * Called only after the work succeeded, so a failed Gemini call does not
+     * cost an employer part of their allowance. BYOAI calls are logged too but
+     * never counted — charging somebody for spending their own budget would be
+     * indefensible.
+     */
+    public function record(?Company $company, string $feature, ?string $source, ?int $userId = null): void
+    {
+        if ($company === null || $source === null) {
+            return;
+        }
+
+        AiUsage::create([
+            'company_id' => $company->id,
+            'user_id' => $userId,
+            'feature' => $feature,
+            'source' => $source,
+        ]);
+    }
+
+    /** Platform AI actions used this calendar month. BYOAI is excluded. */
+    public function usedThisMonth(Company $company): int
+    {
+        return AiUsage::where('company_id', $company->id)
+            ->where('source', 'platform')
+            ->where('created_at', '>=', now()->startOfMonth())
+            ->count();
+    }
+
+    /**
+     * The monthly allowance, or null for no limit.
+     *
+     * -1 means unlimited, matching how job_posts and candidate_views are
+     * seeded. A plan that does not mention ai_usage at all is also unlimited:
+     * silently capping an existing customer at zero because a field was not
+     * filled in would be worse than the problem this solves.
+     */
+    public function usageLimit(Company $company): ?int
+    {
+        $subscription = $company->subscriptions()
+            ->where('status', 'active')
+            ->whereDate('expires_at', '>=', today())
+            ->latest('expires_at')
+            ->first();
+
+        $limit = data_get($subscription?->entitlements, 'ai_usage');
+
+        if ($limit === null || (int) $limit === -1) {
+            return null;
+        }
+
+        return max(0, (int) $limit);
     }
 
     /** Convenience for callers that only need the boolean. */
@@ -85,8 +157,17 @@ class EmployerAiGate
     {
         $decision = $this->decide($company);
 
+        $limit = $company === null ? null : $this->usageLimit($company);
+        $used = $company === null ? 0 : $this->usedThisMonth($company);
+
         return [
             'ai_enabled_platform_wide' => $this->flag('platform_ai_enabled', true),
+            'usage' => [
+                'used_this_month' => $used,
+                'monthly_limit' => $limit,
+                'unlimited' => $limit === null,
+                'remaining' => $limit === null ? null : max(0, $limit - $used),
+            ],
             'ai_available' => $decision['allowed'],
             'source' => $decision['source'],
             'upgrade_required' => $decision['upgrade_required'],

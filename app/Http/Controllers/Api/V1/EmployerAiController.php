@@ -80,6 +80,13 @@ class EmployerAiController extends Controller
             allowAi: $decision['allowed'],
         );
 
+        // Recorded only when the model actually did the work. A template
+        // fallback costs us nothing, so charging it against the employer's
+        // monthly allowance would be taking something for nothing.
+        if ($decision['allowed'] && $letter['provider'] !== 'local_template') {
+            $this->gate->record($company, 'letter', $decision['source'], $request->user()?->id);
+        }
+
         return response()->json([
             'status' => 'success',
             'ai' => $decision['allowed'] && $letter['provider'] !== 'local_template',
@@ -131,6 +138,8 @@ class EmployerAiController extends Controller
             allowAi: $decision['allowed'],
         );
 
+        $this->meter($request, $decision, $result, 'job_description');
+
         return $this->respond($result, $decision);
     }
 
@@ -162,6 +171,8 @@ class EmployerAiController extends Controller
             $application->candidate,
             allowAi: $decision['allowed'],
         );
+
+        $this->meter($request, $decision, $result, 'interview_questions');
 
         return $this->respond($result, $decision);
     }
@@ -233,6 +244,27 @@ class EmployerAiController extends Controller
             'message' => $decision['reason'],
             'data' => collect($result)->except('provider')->all(),
         ]);
+    }
+
+    /**
+     * Counts one AI action, but only when the model produced the answer.
+     *
+     * The engines report which path they took in `provider`; anything
+     * containing "local" means the rule-based fallback ran and no API call was
+     * made. Metering that would charge an employer for something we did not
+     * spend.
+     */
+    private function meter(Request $request, array $decision, array $result, string $feature): void
+    {
+        if (! $decision['allowed']) {
+            return;
+        }
+
+        if (str_contains((string) ($result['provider'] ?? ''), 'local')) {
+            return;
+        }
+
+        $this->gate->record($this->company($request), $feature, $decision['source'], $request->user()?->id);
     }
 
     private function company(Request $request): ?Company
